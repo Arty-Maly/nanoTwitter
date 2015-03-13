@@ -18,6 +18,8 @@ Shotgun gem allows live changes to be made without sinatra server restart.
 
 There are several users created already in DB. 
 passwords for two of them:
+
+
 username: a
 password: a
 
