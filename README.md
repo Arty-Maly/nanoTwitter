@@ -13,12 +13,14 @@ After
  
 	bundle install 
 
-run the program by typing:
+Run the program by typing:
 
 	shotgun app.rb 
-	
-Shotgun gem allows live changes to be made without sinatra server restart.
 
+Shotgun gem allows live changes to be made without sinatra server restart.
+Or you can use the classic method 
+
+	ruby app.rb	
 
 There are several users created already in DB. 
 passwords for two of them:
