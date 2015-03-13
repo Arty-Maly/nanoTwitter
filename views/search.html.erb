@@ -1,0 +1,8 @@
+<h2> Search results </h2>
+<br>
+
+<% @search_results.each do |result| %>
+	@<%= User.find(result.user_id).handle %>: 
+	<%= result.text %>
+	<br>
+<%end%>

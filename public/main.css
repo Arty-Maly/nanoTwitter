@@ -1,0 +1,20 @@
+html {
+    font-size: 62.5%;
+}
+body {
+    background-color: white;
+    color: black;
+    font-family: helvetica, arial, sans-serif;
+    font-size: 1.4em; /* equiv 14px */
+    line-height: 1.5; /* adapt to your design */
+}
+/* you shall not pass */
+div, textarea, table, td, th, code, pre, samp {
+    word-wrap: break-word;
+}
+.left {
+    float: left;
+}
+.w50 {
+    width: 50%;
+}

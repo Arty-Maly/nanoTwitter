@@ -1,0 +1,48 @@
+<% flash.each do |msg| %>
+<%= msg[1] %>
+<% end %>
+<!-- get th user id -->
+<% u = User.where(handle: username) %>
+<% id = u[0].id %>
+
+
+<link rel="stylesheet" href="/main.css">
+<h1> Main Page </h1>
+<br> 
+
+<!-- tweet search form -->
+<form action="/tweet_search" method = "POST">
+  Search Tweets:
+  <input type="search" name="tweet_search">
+  <input type='submit' Value='Search'>
+</form>
+
+<div id="content">
+  <div class="left w50"> 
+  	<h3> Tweets By Me </h3>
+  	<!-- get 5 records starting from last record where id = user_id -->
+  <% t = Tweet.timeline_search(id) %>  
+  <% t.each do |elem| %>
+  <%= elem.text %>
+  <br>
+  <% end %>
+  </div>
+  <div class="left w50">
+  	@<%= username %> 
+  	<br>
+  	<!-- posting a tweet -->
+  	<form action='/tweet' method = "POST">
+  		<input type='text' name='text'>
+  		<br>
+  		<input type='submit' value='Post Tweet'>
+  	</form>
+
+  </div>
+</div>
+
+<!-- log out form -->
+
+<form action='/logout' method ='GET'>
+	<input type='submit' Value='Log Out'>
+</form>
+
