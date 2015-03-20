@@ -1,0 +1,24 @@
+<% flash.each do |msg| %>
+<%= msg[1] %>
+<% end %>
+
+<h1> Page of @<%= user = User.find(userid).handle %> </h1>
+
+
+<div id="content">
+  <div class="left w50"> 
+    <h3> Tweets By user </h3>
+    <!-- get 5 records starting from last record where id = user_id -->
+  	<% t = Tweet.timeline_search(userid) %>  
+  	<% t.each do |elem| %>
+  	<%= elem.text %>
+  <br>
+  <% end %>
+
+  </div>
+
+<br>
+<form action='/follow' method = "POST">
+		<input id="userid" type="hidden" name="userid" value= "<%= userid%>">
+   		<input type='submit' value='Follow'>
+</form>

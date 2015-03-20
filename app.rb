@@ -2,6 +2,7 @@ require 'sinatra'
 require 'sinatra/activerecord'
 require './models/user'
 require './models/tweet'
+require './models/relationship'
 require 'bcrypt'
 require 'sinatra/flash'
 
@@ -109,6 +110,25 @@ post "/tweet_search" do
 	@search_results = Tweet.tweet_search(params[:tweet_search])
 
 	erb :search
+end
+
+
+get "/look" do 
+
+  erb :look, :locals => {:userid => params[:userid]}
+end 
+
+post "/follow" do
+
+  puts "=========================================="
+  
+  User.where(handle: session[:username]).first.follow(User.find(params[:userid]))
+   puts "============================================="
+  User.find(params[:userid]).follow(User.where(handle: session[:username]).first)
+  puts "============================================="
+  flash[:notice] = "Yo are following " + User.find(params[:userid]).handle
+  redirect "/look?userid=#{params[:userid]}"
+  
 end
 
 

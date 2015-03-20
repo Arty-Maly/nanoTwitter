@@ -19,11 +19,12 @@
 
 <div id="content">
   <div class="left w50"> 
-  	<h3> Tweets By Me </h3>
+  	<h3> Tweets By Everyone </h3>
   	<!-- get 5 records starting from last record where id = user_id -->
-  <% t = Tweet.timeline_search(id) %>  
+  <% t = Tweet.all.reverse %>  
   <% t.each do |elem| %>
   <%= elem.text %>
+  <a href="/look?userid=<%=elem.user_id%>">@<%=User.find(elem.user_id).handle %></a>
   <br>
   <% end %>
   </div>
@@ -39,7 +40,17 @@
 
   </div>
 </div>
+<div id="content">
+  <div class="left w50"> 
+    <h3> Tweets By Me </h3>
+    <!-- get 5 records starting from last record where id = user_id -->
+  <% t = Tweet.timeline_search(id) %>  
+  <% t.each do |elem| %>
+  <%= elem.text %>
+  <br>
+  <% end %>
 
+  </div>
 <!-- log out form -->
 
 <form action='/logout' method ='GET'>

@@ -15,6 +15,7 @@ GEM
       thread_safe (~> 0.3, >= 0.3.4)
       tzinfo (~> 1.1)
     arel (6.0.0)
+    bcrypt (3.1.10)
     builder (3.2.2)
     i18n (0.7.0)
     json (1.8.2)
@@ -24,6 +25,8 @@ GEM
       rack
     rack-protection (1.5.3)
       rack
+    shotgun (0.9.1)
+      rack (>= 1.0)
     sinatra (1.4.5)
       rack (~> 1.4)
       rack-protection (~> 1.4)
@@ -42,7 +45,9 @@ PLATFORMS
 
 DEPENDENCIES
   activerecord
+  bcrypt
   rack-flash3
+  shotgun
   sinatra
   sinatra-activerecord
   sqlite3
