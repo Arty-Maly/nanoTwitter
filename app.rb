@@ -107,6 +107,8 @@ end
 
 
 post "/tweet_search" do 
+
+  puts params[:tweet_search]
 	@search_results = Tweet.tweet_search(params[:tweet_search])
 
 	erb :search

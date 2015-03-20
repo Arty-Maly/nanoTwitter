@@ -34,6 +34,8 @@ GEM
     sinatra-activerecord (2.0.5)
       activerecord (>= 3.2)
       sinatra (~> 1.0)
+    sinatra-flash (0.3.0)
+      sinatra (>= 1.0.0)
     sqlite3 (1.3.10)
     thread_safe (0.3.4)
     tilt (1.4.1)
@@ -50,4 +52,5 @@ DEPENDENCIES
   shotgun
   sinatra
   sinatra-activerecord
+  sinatra-flash
   sqlite3

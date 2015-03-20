@@ -1,16 +1,30 @@
-<h1> Welcome To NanoTwitter</h1>
+<head>
+	<!-- Latest compiled and minified CSS -->
+	<link rel="stylesheet" href="/bootstrap.min.css">
+	<link rel="stylesheet" href="/bootstrap-theme.min.css">
+</head>
 
 <br>
-
-<form action="/login/" method= "POST">
-Name:	<input type="text" name="username"> <br>
-Password: <input type="text" name="password"> <br>
-<input type="submit">
-</form>
-
 <br>
 
+<body>
+	<div class="container">
+		<div class="jumbotron">
+	   		<h2>Welcome to nanoTwitter</h2>      
+	    	<p>Log into your account</p>
+	    	<div class="">
+				<form id="login-form" action="/login/" method= "POST">
+					Name: <input type="text" name="username" placeholder="username"> <br>
+					Password: <input type="password" name="password" class="password" placeholder="password"> <br>
+					<input type="submit" class="btn btn-lg btn-primary">
+				</form>
+				<form id="signup-form" action="/signup" method= "GET">
+					Don't have an account? 
+					<br>
+					<input type="submit" class="btn btn-info" value="Sign Up">
+				</form>
+			</div>
+		</div>
 
-<form action="/signup" method= "GET">
-	<input type="submit" Value="Sign Up">
-</form>
+	</div>
+</body>

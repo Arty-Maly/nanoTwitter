@@ -2,23 +2,64 @@
 <%= msg[1] %>
 <% end %>
 
-<h1> Page of @<%= user = User.find(userid).handle %> </h1>
+<head>
+  <link rel="stylesheet" href="/main.css">
+  <link rel="stylesheet" href="/bootstrap.min.css">
+  <link rel="stylesheet" href="/bootstrap-theme.min.css">
+</head>
+
+<body>
+  <!--navbar -->
+  <nav class="navbar menu">
+    <div class="container-fluid">
+      <div class="navbar-header">
+            <form>
+              <button class="navbar-brand btn btn-link btn-inverse" type="submit" formaction="/main" formmethod="GET">nanoTwitter</button>
+            </form>  
+      </div>
 
 
-<div id="content">
-  <div class="left w50"> 
-    <h3> Tweets By user </h3>
-    <!-- get 5 records starting from last record where id = user_id -->
-  	<% t = Tweet.timeline_search(userid) %>  
-  	<% t.each do |elem| %>
-  	<%= elem.text %>
-  <br>
-  <% end %>
+              <!-- Can you connect this for me? -->
+        <ul class="nav navbar-nav navbar-right">
+          <li><a href="#">Account</a></li>
+          <li>
+            <!-- log out form -->
+            <form>
+              <button class="btn btn-inverse" type="submit" formaction="/logout" formmethod="GET">Logout</button>
+            </form>
+          </li>
+        </ul>
+      
+        <div class="nav nav-search">
+          <!-- tweet search form -->       
+          <form>
+            <input type='search' name="tweet_search" placeholder='search' role="search" placeholder="Search Tweets" formaction="/tweet_search" formmethod="POST"> </i>
+          </form>
+          <button class="btn btn-primary" type="submit" formaction="/tweet_search" formmethod="POST" >Search</button>
+        </div>
 
+    </div>
+  </nav>
+
+
+
+  <h1> @<%= user = User.find(userid).handle %>'s Profile </h1>
+  <form action='/follow' method = "POST">
+      <input id="userid" type="hidden" name="userid" value= "<%= userid%>">
+      <input type='submit' value='Follow'>
+  </form>
+
+  <div class="content">
+    <div class=""> 
+      <h3> Your Recent Tweets </h3>
+      <!-- get 5 records starting from last record where id = user_id -->
+    	<% t = Tweet.timeline_search(userid) %>  
+    	<% t.each do |elem| %>
+    	<%= elem.text %>
+    <br>
+    <% end %>
+
+    </div>
   </div>
-
-<br>
-<form action='/follow' method = "POST">
-		<input id="userid" type="hidden" name="userid" value= "<%= userid%>">
-   		<input type='submit' value='Follow'>
-</form>
+  <br>
+</body>

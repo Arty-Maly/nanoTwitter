@@ -12,9 +12,55 @@ body {
 div, textarea, table, td, th, code, pre, samp {
     word-wrap: break-word;
 }
+
+
 .left {
     float: left;
 }
 .w50 {
     width: 50%;
 }
+
+
+.content {
+	text-align: center;
+	background-color: #C5CAE9; 
+	padding: 30px;
+}
+
+
+.content form input {
+	width: 85%;
+}
+.result-tweet-box {
+	width: 45%;
+	float: left;
+	background-color: #C5CAE9;
+	padding-left: 3%;
+	padding-bottom: 3%;
+}
+
+.profile-box {
+	width: 30%;
+	float: left;
+	text-align: center;
+	background-color: #C5CAE9;
+	padding-left: 3%;
+	padding-bottom: 3%;
+	padding-top: 3%;
+}
+
+.menu {
+	padding-top: 10px;
+	width:100%;
+	background-color: #89D1DA;
+}
+
+.nav-search form input{
+	width: 70%;	
+}
+
+.nav-search button {
+	float: right;
+}
+

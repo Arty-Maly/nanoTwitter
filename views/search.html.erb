@@ -1,8 +1,52 @@
-<h2> Search results </h2>
-<br>
+<head>
+<link rel="stylesheet" href="/main.css">
+<link rel="stylesheet" href="/bootstrap.min.css">
+<link rel="stylesheet" href="/bootstrap-theme.min.css">
+</head>
 
-<% @search_results.each do |result| %>
-	@<%= User.find(result.user_id).handle %>: 
-	<%= result.text %>
-	<br>
-<%end%>
+<body>
+	<!--navbar -->
+  <nav class="navbar menu">
+    <div class="container-fluid">
+      <div class="navbar-header">
+            <form>
+              <button class="navbar-brand btn btn-link btn-inverse" type="submit" formaction="/main" formmethod="GET">nanoTwitter</button>
+            </form>  
+      </div>
+
+
+              <!-- Can you connect this for me? -->
+        <ul class="nav navbar-nav navbar-right">
+          <li><a href="/main">Account</a></li>
+          <li>
+            <!-- log out form -->
+            <form>
+              <button class="btn btn-inverse" type="submit" formaction="/logout" formmethod="GET">Logout</button>
+            </form>
+          </li>
+        </ul>
+      
+        <div class="nav nav-search">
+          <!-- tweet search form -->       
+          <form>
+            <input type='search' name="tweet_search" placeholder='search' role="search" placeholder="Search Tweets" formaction="/tweet_search" formmethod="POST"> </i>
+            <button class="btn btn-primary" type="submit" formaction="/tweet_search" formmethod="POST" >Search</button>
+          </form>
+        </div>
+
+    </div>
+  </nav>
+
+
+  <div class="content">
+	  <h2> Search results </h2>
+	  <br>
+	  <div class="a">
+		<% @search_results.each do |result| %>
+			@<%= User.find(result.user_id).handle %>: 
+			<%= result.text %>
+			<br>
+		<%end%>
+		</div>
+	</div>
+</body>

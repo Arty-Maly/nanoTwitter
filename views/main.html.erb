@@ -5,55 +5,63 @@
 <% u = User.where(handle: username) %>
 <% id = u[0].id %>
 
+<head>
+  <link rel="stylesheet" href="/main.css">
+  <link rel="stylesheet" href="/bootstrap.min.css">
+  <link rel="stylesheet" href="/bootstrap-theme.min.css">
+</head>
+<!--navbar -->
+<body>
+  <nav class="navbar menu">
+    <div class="container-fluid">
+      <div class="navbar-header">
+            <form>
+              <button class="navbar-brand btn btn-link btn-inverse" type="submit" formaction="/main" formmethod="GET">nanoTwitter</button>
+            </form>  
+      </div>
 
-<link rel="stylesheet" href="/main.css">
-<h1> Main Page </h1>
-<br> 
 
-<!-- tweet search form -->
-<form action="/tweet_search" method = "POST">
-  Search Tweets:
-  <input type="search" name="tweet_search">
-  <input type='submit' Value='Search'>
-</form>
+              <!-- Can you connect this for me? -->
+        <ul class="nav navbar-nav navbar-right">
+          <li><a href="/main">Account</a></li>
+          <li>
+            <!-- log out form -->
+            <form>
+              <button class="btn btn-inverse" type="submit" formaction="/logout" formmethod="GET">Logout</button>
+            </form>
+          </li>
+        </ul>
+      
+        <div class="nav nav-search">
+          <!-- tweet search form -->       
+          <form>
+            <input type='search' name="tweet_search" placeholder='search' role="search" placeholder="Search Tweets" formaction="/tweet_search" formmethod="POST"> </i>
+          </form>
+          <button class="btn btn-primary" type="submit" formaction="/tweet_search" formmethod="POST" >Search</button>
+        </div>
 
-<div id="content">
-  <div class="left w50"> 
-  	<h3> Tweets By Everyone </h3>
-  	<!-- get 5 records starting from last record where id = user_id -->
-  <% t = Tweet.all.reverse %>  
-  <% t.each do |elem| %>
-  <%= elem.text %>
-  <a href="/look?userid=<%=elem.user_id%>">@<%=User.find(elem.user_id).handle %></a>
-  <br>
-  <% end %>
+    </div>
+  </nav>
+
+
+  <h1> @<%= username %> </h1>
+  <!-- content -->
+
+  <div class="content">
+      <!-- posting a tweet -->
+      <form>
+        <input type='text' name='text' placeholder="What's happening right now?">
+        <button class="btn btn-primary" type="submit" formaction="/tweet" formmethod="POST" >Post Tweet</button>
+      </form>
+
+    	<h3> Tweets By Everyone </h3>
+      <% t = Tweet.all.reverse %>  
+      <% t.each do |elem| %>
+      <%= elem.text %>
+      <a href="/look?userid=<%=elem.user_id%>">@<%=User.find(elem.user_id).handle %></a>
+      <br>
+      <% end %>
+
   </div>
-  <div class="left w50">
-  	@<%= username %> 
-  	<br>
-  	<!-- posting a tweet -->
-  	<form action='/tweet' method = "POST">
-  		<input type='text' name='text'>
-  		<br>
-  		<input type='submit' value='Post Tweet'>
-  	</form>
-
-  </div>
-</div>
-<div id="content">
-  <div class="left w50"> 
-    <h3> Tweets By Me </h3>
-    <!-- get 5 records starting from last record where id = user_id -->
-  <% t = Tweet.timeline_search(id) %>  
-  <% t.each do |elem| %>
-  <%= elem.text %>
-  <br>
-  <% end %>
-
-  </div>
-<!-- log out form -->
-
-<form action='/logout' method ='GET'>
-	<input type='submit' Value='Log Out'>
-</form>
+<body>
 
