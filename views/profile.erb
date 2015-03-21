@@ -1,11 +1,17 @@
-<head>
-<link rel="stylesheet" href="/main.css">
-<link rel="stylesheet" href="/bootstrap.min.css">
-<link rel="stylesheet" href="/bootstrap-theme.min.css">
-</head>
+<% flash.each do |msg| %>
+<%= msg[1] %>
+<% end %>
+<!-- get th user id -->
+<% u = User.where(handle: username) %>
+<% id = u[0].id %>
 
+<head>
+  <link rel="stylesheet" href="/main.css">
+  <link rel="stylesheet" href="/bootstrap.min.css">
+  <link rel="stylesheet" href="/bootstrap-theme.min.css">
+</head>
+<!--navbar -->
 <body>
-	<!--navbar -->
   <nav class="navbar menu">
     <div class="container-fluid">
       <div class="navbar-header">
@@ -30,23 +36,30 @@
           <!-- tweet search form -->       
           <form>
             <input type='search' name="tweet_search" placeholder='search' role="search" placeholder="Search Tweets" formaction="/tweet_search" formmethod="POST"> </i>
-            <button class="btn btn-primary" type="submit" formaction="/tweet_search" formmethod="POST" >Search</button>
           </form>
+          <button class="btn btn-primary" type="submit" formaction="/tweet_search" formmethod="POST" >Search</button>
         </div>
 
     </div>
   </nav>
 
 
+  <h1> @<%= username %> </h1>
+  <!-- content -->
+
   <div class="content">
-	  <h2> Search results </h2>
-	  <br>
-	  <div class="a">
-		<% @search_results.each do |result| %>
-			@<%= User.find(result.user_id).handle %>: 
-			<%= result.text %>
-			<br>
-		<%end%>
-		</div>
-	</div>
-</body>
+      <!-- posting a tweet -->
+      <form>
+        <input type='text' name='text' placeholder="What's happening right now?">
+        <button class="btn btn-primary" type="submit" formaction="/tweet" formmethod="POST" >Post Tweet</button>
+      </form>
+			
+			<h1> Who is being followed by you? </h1>
+			<% @followees.each do |followee| %>
+					<a href="/look?userid=<%=followee.id%>">@<%=followee.handle %></a>
+					<br>
+			<% end %>
+
+  </div>
+<body>
+

@@ -21,7 +21,7 @@
 
               <!-- Can you connect this for me? -->
         <ul class="nav navbar-nav navbar-right">
-          <li><a href="#">Account</a></li>
+          <li><a href="/users/profile">Account</a></li>
           <li>
             <!-- log out form -->
             <form>
@@ -44,11 +44,22 @@
 
 
   <h1> @<%= user = User.find(userid).handle %>'s Profile </h1>
-  <form action='/follow' method = "POST">
-      <input id="userid" type="hidden" name="userid" value= "<%= userid%>">
-      <input type='submit' value='Follow'>
-  </form>
-
+	
+	<h4><a href="/followers?userid=<%=userid%>">Followers: <%= @num_followers %> Users</a></h4>
+	<h4><a href="/followees?userid=<%=userid%>">Following: <%= @num_following %> Users</a></h4>
+	<br>
+	<% if @does_follow == false %>
+		<form action='/follow' method = "POST">
+				<input id="userid" type="hidden" name="userid" value= "<%= userid%>">
+				<input type='submit' value='Follow'>
+		</form>
+	<% elsif @does_follow == true %>
+		<form action='/unfollow' method = "POST">
+				<input id="userid" type="hidden" name="userid" value= "<%= userid%>">
+				<input type='submit' value='Unfollow'>
+		</form>
+	<% end %>
+		
   <div class="content">
     <div class=""> 
       <h3> Your Recent Tweets </h3>
@@ -58,7 +69,7 @@
     	<%= elem.text %>
     <br>
     <% end %>
-
+	
     </div>
   </div>
   <br>

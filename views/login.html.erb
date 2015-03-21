@@ -2,6 +2,7 @@
 	<!-- Latest compiled and minified CSS -->
 	<link rel="stylesheet" href="/bootstrap.min.css">
 	<link rel="stylesheet" href="/bootstrap-theme.min.css">
+	<link rel="stylesheet" href="/main.css">
 </head>
 
 <br>
@@ -26,5 +27,14 @@
 			</div>
 		</div>
 
+	</div>
+	<div class="content">
+		<h3> Tweets By Everyone </h3>
+		<% t = Tweet.all.reverse %>  
+		<% t.each do |elem| %>
+		<%= elem.text %>
+		<a href="/look?userid=<%=elem.user_id%>">@<%=User.find(elem.user_id).handle %></a>
+		<br>
+		<% end %>
 	</div>
 </body>

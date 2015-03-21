@@ -1,11 +1,15 @@
+<% flash.each do |msg| %>
+<%= msg[1] %>
+<% end %>
+
 <head>
-<link rel="stylesheet" href="/main.css">
-<link rel="stylesheet" href="/bootstrap.min.css">
-<link rel="stylesheet" href="/bootstrap-theme.min.css">
+  <link rel="stylesheet" href="/main.css">
+  <link rel="stylesheet" href="/bootstrap.min.css">
+  <link rel="stylesheet" href="/bootstrap-theme.min.css">
 </head>
 
 <body>
-	<!--navbar -->
+  <!--navbar -->
   <nav class="navbar menu">
     <div class="container-fluid">
       <div class="navbar-header">
@@ -30,23 +34,20 @@
           <!-- tweet search form -->       
           <form>
             <input type='search' name="tweet_search" placeholder='search' role="search" placeholder="Search Tweets" formaction="/tweet_search" formmethod="POST"> </i>
-            <button class="btn btn-primary" type="submit" formaction="/tweet_search" formmethod="POST" >Search</button>
           </form>
+          <button class="btn btn-primary" type="submit" formaction="/tweet_search" formmethod="POST" >Search</button>
         </div>
 
     </div>
   </nav>
 
 
-  <div class="content">
-	  <h2> Search results </h2>
-	  <br>
-	  <div class="a">
-		<% @search_results.each do |result| %>
-			@<%= User.find(result.user_id).handle %>: 
-			<%= result.text %>
-			<br>
-		<%end%>
-		</div>
-	</div>
+
+  <h1> Who is following @<%= user = User.find(userid).handle %>? </h1>
+	<% @followers.each do |follower| %>
+      <a href="/look?userid=<%=follower.id%>">@<%=follower.handle %></a>
+      <br>
+  <% end %>
+		
+  <br>
 </body>
