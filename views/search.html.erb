@@ -43,7 +43,7 @@
 	  <br>
 	  <div class="a">
 		<% @search_results.each do |result| %>
-			@<%= User.find(result.user_id).handle %>: 
+			<a href="/look?userid=<%=result.user_id%>">@<%= User.find(result.user_id).handle %>: </a>
 			<%= result.text %>
 			<br>
 		<%end%>
