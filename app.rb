@@ -151,11 +151,13 @@ get "/look" do
 	#@does_follow is a boolean representing whether you are a follower or not.
 	@does_follow = false
 	profile_user_id = params[:userid].to_i
-	session_id = User.where(handle: session[:username]).first.id
-	followees = Relationship.where(follower_id: session_id).pluck(:followed_id)
-	followees.each do |followee|
-		if followee == profile_user_id
-			@does_follow = true
+	if login?
+		session_id = User.where(handle: session[:username]).first.id
+		followees = Relationship.where(follower_id: session_id).pluck(:followed_id)
+		followees.each do |followee|
+			if followee == profile_user_id
+				@does_follow = true
+			end
 		end
 	end
 	
