@@ -33,7 +33,7 @@
 		<% t = Tweet.all.reverse %>  
 		<% t.each do |elem| %>
 		<%= elem.text %>
-		<a href="/look?userid=<%=elem.user_id%>">@<%=User.find(elem.user_id).handle %></a>
+		@<%=User.find(elem.user_id).handle %>
 		<br>
 		<% end %>
 	</div>
