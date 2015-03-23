@@ -48,6 +48,7 @@
 	<h4><a href="/followers?userid=<%=userid%>">Followers: <%= @num_followers %> Users</a></h4>
 	<h4><a href="/followees?userid=<%=userid%>">Following: <%= @num_following %> Users</a></h4>
 	<br>
+  <% if login? %>
 	<% if @does_follow == false %>
 		<form action='/follow' method = "POST">
 				<input id="userid" type="hidden" name="userid" value= "<%= userid%>">
@@ -59,6 +60,7 @@
 				<input type='submit' value='Unfollow'>
 		</form>
 	<% end %>
+  <% end %>
 		
   <div class="content">
     <div class=""> 

@@ -17,6 +17,8 @@ GEM
     arel (6.0.0)
     bcrypt (3.1.10)
     builder (3.2.2)
+    faker (1.4.3)
+      i18n (~> 0.5)
     i18n (0.7.0)
     json (1.8.2)
     minitest (5.5.1)
@@ -25,6 +27,7 @@ GEM
       rack
     rack-protection (1.5.3)
       rack
+    rake (10.4.2)
     shotgun (0.9.1)
       rack (>= 1.0)
     sinatra (1.4.5)
@@ -48,7 +51,9 @@ PLATFORMS
 DEPENDENCIES
   activerecord
   bcrypt
+  faker
   rack-flash3
+  rake
   shotgun
   sinatra
   sinatra-activerecord

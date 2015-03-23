@@ -169,19 +169,19 @@ end
 
 post "/follow" do
 
-  puts "=========================================="
+
   
   User.where(handle: session[:username]).first.follow(User.find(params[:userid]))
-   puts "============================================="
+   
   flash[:notice] = "You are following " + User.find(params[:userid]).handle
   redirect "/look?userid=#{params[:userid]}"
   
 end
 
 post "/unfollow" do
-	puts "=========================================="
+	
 	User.where(handle: session[:username]).first.unfollow(User.find(params[:userid]))
-   puts "============================================="
+  
   flash[:notice] = "You are no longer following " + User.find(params[:userid]).handle
   redirect "/look?userid=#{params[:userid]}"
 end
