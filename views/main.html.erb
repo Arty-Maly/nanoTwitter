@@ -9,61 +9,91 @@
   <link rel="stylesheet" href="/main.css">
   <link rel="stylesheet" href="/bootstrap.min.css">
   <link rel="stylesheet" href="/bootstrap-theme.min.css">
+  <link rel="stylesheet" href="/cards.css">
+  <link rel="stylesheet" href="/menus.css">
 </head>
-<!--navbar -->
+
+
 <body>
-  <nav class="navbar menu">
-    <div class="container-fluid">
-      <div class="navbar-header">
-            <form>
-              <button class="navbar-brand btn btn-link btn-inverse" type="submit" formaction="/main" formmethod="GET">nanoTwitter</button>
-            </form>  
-      </div>
+  <nav>
+    <div id="main-navbar" class="container-fluid">
+      <a class="navbar-brand" href="/main">nanoTwitter</a>
 
-
-              <!-- Can you connect this for me? -->
-        <ul class="nav navbar-nav navbar-right">
-          <li><a href="/users/profile">Account</a></li>
-          <li>
-            <!-- log out form -->
-            <form>
-              <button class="btn btn-inverse" type="submit" formaction="/logout" formmethod="GET">Logout</button>
-            </form>
-          </li>
-        </ul>
-      
-        <div class="nav nav-search">
-          <!-- tweet search form -->       
-          <form>
-            <input type='search' name="tweet_search" placeholder='search' role="search" placeholder="Search Tweets" formaction="/tweet_search" formmethod="POST"> </i>
+      <div class="nav navbar-nav right">
+        <li><a href="/users/profile">Account </a></li>
+        <li>
+          <form class="navbar-form">
+            <button class="btn btn-link" type="submit" formaction="/logout" formmethod="GET">Logout</button>
           </form>
-          <button class="btn btn-primary" type="submit" formaction="/tweet_search" formmethod="POST" >Search</button>
-        </div>
-
+        </li>
+        <li>
+          <form class="navbar-form" role="search">
+              <input type="text" name="tweet_search"class="form-control" placeholder="Search Tweets!" formaction="/tweet_search" formethod="POST" role="search">
+              <button type="submit" class="btn btn-default" formaction="/tweet_search" formmethod="POST" role="submit">Search</button>
+          </form>
+        </li>
+      </div>
     </div>
   </nav>
 
 
-  <h1> @<%= username %> </h1>
-  <!-- content -->
+
+
+  <div id="profile-box" class="container left">
+    <div id="user-quick-profile">
+      <h2>
+        <span> @<%= username %> </span>
+        <span><a href="/followers?userid=<%=id%>">You have <%= @num_followers %> Followers</a></span>
+        <span><a href="/followees?userid=<%=id%>">You are following <%= @num_following %> users</a></span>
+      </h2>
+    </div>
+      <!-- content -->
+  </div>
 
   <div class="content">
-      <!-- posting a tweet -->
-      <form>
-        <input type='text' name='text' placeholder="What's happening right now?">
-        <button class="btn btn-primary" type="submit" formaction="/tweet" formmethod="POST" >Post Tweet</button>
-      </form>
-			
-			<h4><a href="/followers?userid=<%=id%>">Followers: <%= @num_followers %> Users</a></h4>
-			<h4><a href="/followees?userid=<%=id%>">Following: <%= @num_following %> Users</a></h4>
-			
-			<h3> Recent Tweets By You and The People You Follow </h3>
-      <% @followee_tweets.each do |elem| %>
-      <%= elem.text %>
-      <a href="/look?userid=<%=elem.user_id%>">@<%=User.find(elem.user_id).handle %></a>
-      <br>
-      <% end %>
+    <!-- Form to tweet -->
+    <form style="width: 95%;" id="tweet-bar" class="containter form-group">
+      <input type='text' name='text' placeholder="What's happening right now?">
+      <button class="btn btn-primary" type="submit" formaction="/tweet" formmethod="POST" >Post Tweet</button>
+    </form>
 
+    <span id="tweet-list">
+      <h4> Recent Tweets By You and The People You Follow </h4>
+      <ul>
+        <% @followee_tweets.each do |elem| %>
+          <li data-toggle="modal" data-target="#myModal">
+            <img src="http://lorempixum.com/100/100/nature/1">
+            <p>
+              <%= elem.text %>
+              <a href="/look?userid=<%=elem.user_id%>">@<%=User.find(elem.user_id).handle %></a>
+              <a>timestamp</a>
+            </p>
+          </li>
+        <% end %>
+      </ul>
+    </span>
+
+    <span id="tweet-list">
+      <h4> Global Tweets </h4>
+      <ul>
+        <% t = Tweet.all.reverse %>
+        <% t.each do |elem| %>
+        <!-- This line of code triggers the modal, and should trigger to show the user's profile -->
+        <li data-toggle="modal" data-target="#myModal">
+          <img src="http://lorempixum.com/100/100/nature/1">
+            <p>
+              <!-- this should be the Username that is public -->
+              <a href="/look?userid=<%=elem.user_id%>">Username</a>
+              <!-- this should be the @usertag -->
+              <a href="/look?userid=<%=elem.user_id%>">@<%=User.find(elem.user_id).handle %></a>
+              <a>timestamp</a>
+            </p>
+            <p> <%= elem.text %> </p>
+        </li>
+        <% end %>
+      </ul>
+    </span>
   </div>
+
 <body>
 

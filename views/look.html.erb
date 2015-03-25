@@ -6,77 +6,65 @@
   <link rel="stylesheet" href="/main.css">
   <link rel="stylesheet" href="/bootstrap.min.css">
   <link rel="stylesheet" href="/bootstrap-theme.min.css">
+  <link rel="stylesheet" href="/menus.css">
+  <link rel="stylesheet" href="/look.css">
 </head>
 
 <body>
-  <!--navbar -->
-  <nav class="navbar menu">
-    <div class="container-fluid">
-      <div class="navbar-header">
-            <form>
-              <button class="navbar-brand btn btn-link btn-inverse" type="submit" formaction="/main" formmethod="GET">nanoTwitter</button>
-            </form>  
-      </div>
+  <nav>
+    <div id="main-navbar" class="container-fluid">
+      <a class="navbar-brand" href="/main">nanoTwitter</a>
 
-
-              <!-- Can you connect this for me? -->
-        <ul class="nav navbar-nav navbar-right">
-          <li><a href="/users/profile">Account</a></li>
-          <li>
-            <!-- log out form -->
-            <form>
-              <button class="btn btn-inverse" type="submit" formaction="/logout" formmethod="GET">Logout</button>
-            </form>
-          </li>
-        </ul>
-      
-        <div class="nav nav-search">
-          <!-- tweet search form -->       
-          <form>
-            <input type='search' name="tweet_search" placeholder='search' role="search" placeholder="Search Tweets" formaction="/tweet_search" formmethod="POST"> </i>
+      <div class="nav navbar-nav right">
+        <li><a href="/users/profile">Account </a></li>
+        <li>
+          <form class="navbar-form">
+            <button class="btn btn-link" type="submit" formaction="/logout" formmethod="GET">Logout</button>
           </form>
-          <button class="btn btn-primary" type="submit" formaction="/tweet_search" formmethod="POST" >Search</button>
-        </div>
-
+        </li>
+        <li>
+          <form class="navbar-form" role="search">
+              <input type="text" name="tweet_search"class="form-control" placeholder="Search Tweets!" formaction="/tweet_search" formethod="POST" role="search">
+              <button type="submit" class="btn btn-default" formaction="/tweet_search" formmethod="POST" role="submit">Search</button>
+          </form>
+        </li>
+      </div>
     </div>
   </nav>
 
+  <div id="profile-box" class="containter left content">
+    <h2> @<%= user = User.find(userid).handle %>'s Profile
+      <a href="/followers?userid=<%=userid%>">Followers: <%= @num_followers %> Users</a>
+	    <a href="/followees?userid=<%=userid%>">Following: <%= @num_following %> Users</a>
+    </h2>
 
+    <% if login?%>
+      <% if @does_follow == false %>
+        <form action='/follow' method = "POST">
+            <input id="userid" type="hidden" name="userid" value= "<%= userid%>">
+            <input type='submit' value='Follow'>
+        </form>
 
-  <h1> @<%= user = User.find(userid).handle %>'s Profile </h1>
-	
-	<h4><a href="/followers?userid=<%=userid%>">Followers: <%= @num_followers %> Users</a></h4>
-	<h4><a href="/followees?userid=<%=userid%>">Following: <%= @num_following %> Users</a></h4>
-	<br>
-
-	<% if login?%>
-
-	<% if @does_follow == false %>
-		<form action='/follow' method = "POST">
-				<input id="userid" type="hidden" name="userid" value= "<%= userid%>">
-				<input type='submit' value='Follow'>
-		</form>
-	<% elsif @does_follow == true %>
-		<form action='/unfollow' method = "POST">
-				<input id="userid" type="hidden" name="userid" value= "<%= userid%>">
-				<input type='submit' value='Unfollow'>
-		</form>
-	<% end %>
-
-  <% end %>
-
-		
-  <div class="content">
-    <div class=""> 
-      <h3> Your Recent Tweets </h3>
-      <!-- get 5 records starting from last record where id = user_id -->
-    	<% t = Tweet.timeline_search(userid) %>  
-    	<% t.each do |elem| %>
-    	<%= elem.text %>
-    <br>
+      <% elsif @does_follow == true %>
+          <form action='/unfollow' method = "POST">
+              <input id="userid" type="hidden" name="userid" value= "<%= userid%>">
+              <input type='submit' value='Unfollow'>
+          </form>
+      <% end %>
     <% end %>
-	
-    </div>
+    
+
+    <h3> Your Recent Tweets </h3>
+    <br>
+      <!-- get 5 records starting from last record where id = user_id -->
+    <ul>
+      <% t = Tweet.timeline_search(userid) %>  
+      <% t.each do |elem| %>
+      <li><p><%= elem.text %></p></li>
+      <br>
+      <% end %>
+    </ul>
   </div>
-  <br>
+
+
 </body>

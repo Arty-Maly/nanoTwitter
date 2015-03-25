@@ -1,0 +1,60 @@
+* {margin: 0; padding: 0;}
+ 
+ul {
+  list-style-type: none;
+  width: 80%%;
+}
+ 
+h4 {
+  font: bold 16px/1.5 Helvetica, Verdana, sans-serif;
+}
+ 
+li img {
+  float: left;
+  max-height: 60px;
+  max-width: 60px;
+  margin: 0 15px 0 0;
+}
+ 
+li p {
+  font: 200 14px/1.5 Georgia, Times New Roman, serif;
+  margin-left: 0px;
+}
+ 
+li {
+  padding: 5px;
+  overflow: auto;
+}
+ 
+li:hover {
+  background: #eee;
+  cursor: pointer;
+}
+
+#tweet-list {
+  display: block;
+  float:left;
+  text-align:center;
+}
+
+#tweet-list ul {
+  display: inline-block;
+  background-color: #E3F2FD;
+}
+
+#tweet-list ul p {
+  text-align: left;
+}
+
+#tweet-list-global {
+  float:left;
+}
+ 
+
+.left {
+  float:left;
+}
+
+.right {
+
+}

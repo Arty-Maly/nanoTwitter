@@ -2,7 +2,7 @@ html {
     font-size: 62.5%;
 }
 body {
-    background-color: white;
+/*	background-image: url("http://ianlunn.co.uk/wp-content/uploads/2010/11/bg-sky-300x201.png"); */
     color: black;
     font-family: helvetica, arial, sans-serif;
     font-size: 1.4em; /* equiv 14px */
@@ -24,20 +24,12 @@ div, textarea, table, td, th, code, pre, samp {
 
 .content {
 	text-align: center;
-	background-color: #C5CAE9; 
 	padding: 30px;
 }
 
 
 .content form input {
 	width: 85%;
-}
-.result-tweet-box {
-	width: 45%;
-	float: left;
-	background-color: #C5CAE9;
-	padding-left: 3%;
-	padding-bottom: 3%;
 }
 
 .profile-box {
@@ -62,5 +54,17 @@ div, textarea, table, td, th, code, pre, samp {
 
 .nav-search button {
 	float: right;
+}
+
+#tweet-list-global {
+  width:45%;
+  float:left;
+}
+
+#tweet-list {
+  display: block;
+  float:left;
+  text-align:center;
+  width:45%;
 }
 

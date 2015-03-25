@@ -1,0 +1,17 @@
+#main-navbar {
+	background-color: #0D47A1;
+	width: auto;
+}
+
+.right {
+	float:right;
+}
+
+.left {
+	float:left;
+}
+
+#tweet-bar input {
+	width: 85%;
+}
+

@@ -4,44 +4,32 @@
 
 <head>
   <link rel="stylesheet" href="/main.css">
+  <link rel="stylesheet" href="/menus.css">
   <link rel="stylesheet" href="/bootstrap.min.css">
   <link rel="stylesheet" href="/bootstrap-theme.min.css">
 </head>
 
 <body>
-  <!--navbar -->
-  <nav class="navbar menu">
-    <div class="container-fluid">
-      <div class="navbar-header">
-            <form>
-              <button class="navbar-brand btn btn-link btn-inverse" type="submit" formaction="/main" formmethod="GET">nanoTwitter</button>
-            </form>  
-      </div>
+  <nav>
+    <div id="main-navbar" class="container-fluid">
+      <a class="navbar-brand" href="/main">nanoTwitter</a>
 
-
-              <!-- Can you connect this for me? -->
-        <ul class="nav navbar-nav navbar-right">
-          <li><a href="/users/profile">Account</a></li>
-          <li>
-            <!-- log out form -->
-            <form>
-              <button class="btn btn-inverse" type="submit" formaction="/logout" formmethod="GET">Logout</button>
-            </form>
-          </li>
-        </ul>
-      
-        <div class="nav nav-search">
-          <!-- tweet search form -->       
-          <form>
-            <input type='search' name="tweet_search" placeholder='search' role="search" placeholder="Search Tweets" formaction="/tweet_search" formmethod="POST"> </i>
+      <div class="nav navbar-nav right">
+        <li><a href="/users/profile">Account </a></li>
+        <li>
+          <form class="navbar-form">
+            <button class="btn btn-link" type="submit" formaction="/logout" formmethod="GET">Logout</button>
           </form>
-          <button class="btn btn-primary" type="submit" formaction="/tweet_search" formmethod="POST" >Search</button>
-        </div>
-
+        </li>
+        <li>
+          <form class="navbar-form" role="search">
+              <input type="text" name="tweet_search"class="form-control" placeholder="Search Tweets!" formaction="/tweet_search" formethod="POST" role="search">
+              <button type="submit" class="btn btn-default" formaction="/tweet_search" formmethod="POST" role="submit">Search</button>
+          </form>
+        </li>
+      </div>
     </div>
   </nav>
-
-
 
   <h1> Who is following @<%= user = User.find(userid).handle %>? </h1>
 	<% @followers.each do |follower| %>

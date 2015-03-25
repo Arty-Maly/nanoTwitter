@@ -1,0 +1,26 @@
+.container {
+  opacity: 0.8;
+}
+
+.login-credentials {
+	text-align: center;
+}
+
+.login-credentials div {
+	text-align: left;
+}
+
+h3 {
+	text-align: center;
+	padding: 10px 10px 10px 10px;
+}
+
+#loginbox {
+
+}
+
+body {
+	background-image: url("http://ianlunn.co.uk/wp-content/uploads/2010/11/bg-sky-300x201.png");
+    background-size: 100%;
+    
+}
