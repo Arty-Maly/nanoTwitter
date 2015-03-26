@@ -11,6 +11,18 @@ configure :development do
 	)
 end
 
+configure :test do
+	db = URI.parse(ENV['DATABASE_URL'])
+ 
+	ActiveRecord::Base.establish_connection(
+			:adapter => db.scheme == 'sqlite3' : db.scheme,
+			:host     => db.host,
+			:database => db.path[1..-1],
+			:encoding => 'utf8'
+	)
+end
+
+
 configure :production do
 	db = URI.parse(ENV['DATABASE_URL'] || 'postgres://localhost/mydb')
  

@@ -3,6 +3,11 @@ development:
     database: db/development.sqlite3
     host: localhost
 
+test:
+    adapter: sqlite3
+    database: db/development.sqlite3
+    host: localhost
+    
 production:
     adapter: postgresql
     database: development
