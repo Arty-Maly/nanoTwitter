@@ -31,6 +31,10 @@ end
 ########################################
 
 #routes
+get '/loaderio-cb42c0b1ba46fc44b724647ec508a058/' do 
+	"loaderio-cb42c0b1ba46fc44b724647ec508a058"
+end
+
 
 get '/' do 
 	erb :login 
