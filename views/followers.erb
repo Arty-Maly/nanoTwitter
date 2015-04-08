@@ -12,10 +12,10 @@
 <body>
   <nav>
     <div id="main-navbar" class="container-fluid">
-      <a class="navbar-brand" href="/main">nanoTwitter</a>
+      <a class="navbar-brand" href="/">nanoTwitter</a>
 
       <div class="nav navbar-nav right">
-        <li><a href="/users/profile">Account </a></li>
+        <li><a href="/user/profile">Account </a></li>
         <li>
           <form class="navbar-form">
             <button class="btn btn-link" type="submit" formaction="/logout" formmethod="GET">Logout</button>
@@ -33,7 +33,7 @@
 
   <h1> Who is following @<%= user = User.find(userid).handle %>? </h1>
 	<% @followers.each do |follower| %>
-      <a href="/look?userid=<%=follower.id%>">@<%=follower.handle %></a>
+      <a href="/user/<%=follower.id%>">@<%=follower.handle %></a>
       <br>
   <% end %>
 		

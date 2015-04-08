@@ -9,10 +9,10 @@
 <body>
   <nav>
     <div id="main-navbar" class="container-fluid">
-      <a class="navbar-brand" href="/main">nanoTwitter</a>
+      <a class="navbar-brand" href="/">nanoTwitter</a>
 
       <div class="nav navbar-nav right">
-        <li><a href="/users/profile">Account </a></li>
+        <li><a href="/user/profile">Account </a></li>
         <li>
           <form class="navbar-form">
             <button class="btn btn-link" type="submit" formaction="/logout" formmethod="GET">Logout</button>
@@ -36,7 +36,7 @@
           <% @search_results.each do |result| %>
           <li data-toggle="modal" data-target="#myModal">
             <img src="http://lorempixum.com/100/100/nature/1">
-              <p><a href="/look?userid=<%=result.user_id%>">@<%= User.find(result.user_id).handle %>: </a></p>
+              <p><a href="/user/<%=result.user_id%>">@<%= User.find(result.user_id).handle %>: </a></p>
               <p> <%= result.text %> </p>
           </li>
           <% end %>

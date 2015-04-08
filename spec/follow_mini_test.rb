@@ -128,31 +128,31 @@ describe "follow" do
 			end
 		end
 		
-		describe "GET on /look" do
+		describe "GET on /user" do
 			it "should display the correct number of followers" do
 				Relationship.create(follower_id: @bill.id, followed_id: @phil.id)
-				get "/look?userid=#{@phil.id}", {:userid => @phil.id}, { "rack.session" => {:username => "bill"}}
+				get "/user/#{@phil.id}", {:userid => @phil.id}, { "rack.session" => {:username => "bill"}}
 				last_response.must_be :ok?
 				last_response.body.must_include "Followers: 1 Users"
 				
-				get "/look?userid=#{@bill.id}", {:userid => @bill.id}, { "rack.session" => {:username => "phil"}}
+				get "/user/#{@bill.id}", {:userid => @bill.id}, { "rack.session" => {:username => "phil"}}
 				last_response.must_be :ok?
 				last_response.body.must_include "Followers: 0 Users"
 			end
 			
 			it "should display the correct number of users being followed" do
 				Relationship.create(follower_id: @bill.id, followed_id: @phil.id)
-				get "/look?userid=#{@bill.id}", {:userid => @bill.id}, { "rack.session" => {:username => "phil"}}
+				get "/user/#{@bill.id}", {:userid => @bill.id}, { "rack.session" => {:username => "phil"}}
 				last_response.must_be :ok?
 				last_response.body.must_include "Following: 1 Users"
 				
-				get "/look?userid=#{@phil.id}", {:userid => @phil.id}, { "rack.session" => {:username => "bill"}}
+				get "/user/#{@phil.id}", {:userid => @phil.id}, { "rack.session" => {:username => "bill"}}
 				last_response.must_be :ok?
 				last_response.body.must_include "Following: 0 Users"
 			end
 			
 			it "should display a follow button if the logged-in user is not a follower" do
-				get "/look?userid=#{@phil.id}", {:userid => @phil.id}, { "rack.session" => {:username => "bill"}}
+				get "/user/#{@phil.id}", {:userid => @phil.id}, { "rack.session" => {:username => "bill"}}
 				last_response.must_be :ok?
 				last_response.body.wont_include "form action='/unfollow'"
 				last_response.body.must_include "form action='/follow'"
@@ -160,14 +160,14 @@ describe "follow" do
 			
 			it "should display an unfollow button if the logged-in user is a follower" do
 				Relationship.create(follower_id: @bill.id, followed_id: @phil.id)
-				get "/look?userid=#{@phil.id}", {:userid => @phil.id}, { "rack.session" => {:username => "bill"}}
+				get "/user/#{@phil.id}", {:userid => @phil.id}, { "rack.session" => {:username => "bill"}}
 				last_response.must_be :ok?
 				last_response.body.wont_include "form action='/follow'"
 				last_response.body.must_include "form action='/unfollow'"
 			end
 
 			it "should display no follow or unfollow button if the user is not logged in" do
-				get "/look?userid=#{@phil.id}", :userid => @phil.id
+				get "/user/#{@phil.id}", :userid => @phil.id
 				last_response.must_be :ok?
 				last_response.body.wont_include "form action='/follow'"
 				last_response.body.wont_include "form action='/unfollow'"

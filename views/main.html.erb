@@ -17,10 +17,10 @@
 <body>
   <nav>
     <div id="main-navbar" class="container-fluid">
-      <a class="navbar-brand" href="/main">nanoTwitter</a>
+      <a class="navbar-brand" href="/">nanoTwitter</a>
 
       <div class="nav navbar-nav right">
-        <li><a href="/users/profile">Account </a></li>
+        <li><a href="/user/profile">Account </a></li>
         <li>
           <form class="navbar-form">
             <button class="btn btn-link" type="submit" formaction="/logout" formmethod="GET">Logout</button>
@@ -65,7 +65,7 @@
             <img src="http://lorempixum.com/100/100/nature/1">
             <p>
               <%= elem.text %>
-              <a href="/look?userid=<%=elem.user_id%>">@<%=User.find(elem.user_id).handle %></a>
+              <a href="/user/<%=elem.user_id%>">@<%=User.find(elem.user_id).handle %></a>
               <a>timestamp</a>
             </p>
           </li>
@@ -76,16 +76,16 @@
     <span id="tweet-list">
       <h4> Global Tweets </h4>
       <ul>
-        <% t = Tweet.all.reverse %>
+        <% t = Tweet.order("created_at DESC").limit(100).all %>
         <% t.each do |elem| %>
         <!-- This line of code triggers the modal, and should trigger to show the user's profile -->
         <li data-toggle="modal" data-target="#myModal">
           <img src="http://lorempixum.com/100/100/nature/1">
             <p>
               <!-- this should be the Username that is public -->
-              <a href="/look?userid=<%=elem.user_id%>">Username</a>
+              <a href="/user/<%=elem.user_id%>">Username</a>
               <!-- this should be the @usertag -->
-              <a href="/look?userid=<%=elem.user_id%>">@<%=User.find(elem.user_id).handle %></a>
+              <a href="/user/<%=elem.user_id%>">@<%=User.find(elem.user_id).handle %></a>
               <a>timestamp</a>
             </p>
             <p> <%= elem.text %> </p>

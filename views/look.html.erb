@@ -13,10 +13,10 @@
 <body>
   <nav>
     <div id="main-navbar" class="container-fluid">
-      <a class="navbar-brand" href="/main">nanoTwitter</a>
+      <a class="navbar-brand" href="/">nanoTwitter</a>
 
       <div class="nav navbar-nav right">
-        <li><a href="/users/profile">Account </a></li>
+        <li><a href="/user/profile">Account </a></li>
         <li>
           <form class="navbar-form">
             <button class="btn btn-link" type="submit" formaction="/logout" formmethod="GET">Logout</button>
@@ -38,7 +38,7 @@
 	    <a href="/followees?userid=<%=userid%>">Following: <%= @num_following %> Users</a>
     </h2>
 
-    <% if login?%>
+    <% if login? && userid.to_i != @session_id %>
       <% if @does_follow == false %>
         <form action='/follow' method = "POST">
             <input id="userid" type="hidden" name="userid" value= "<%= userid%>">
