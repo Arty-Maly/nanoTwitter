@@ -51,6 +51,13 @@ get '/loaderio-cb42c0b1ba46fc44b724647ec508a058/' do
 	"loaderio-cb42c0b1ba46fc44b724647ec508a058"
 end
 
+#other loader token
+
+get '/loaderio-5f5ecc0ac53eec6834d377dbb3605118/' do 
+	"loaderio-5f5ecc0ac53eec6834d377dbb3605118"
+end
+
+
 #Get method for the main page
 get "/" do 
 	if login?
