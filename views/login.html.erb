@@ -145,7 +145,7 @@
 	            <!-- this should be the Username that is public -->
 	            <a href="/user/<%=elem.user_id%>">Username</a>
 	            <!-- this should be the @usertag -->
-	            <a href="/user/<%=elem.user_id%>">@<%=User.find(elem.user_id).handle %></a>
+	            <a href="/user/<%=elem.user_id%>">@<%=elem.handle %></a>
 	            <a>timestamp</a>
 	          </p>
 	          <p> <%= elem.text %> </p>
