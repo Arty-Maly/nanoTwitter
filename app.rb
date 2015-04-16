@@ -85,11 +85,13 @@ get "/" do
 		
 		erb :main
 	else
-		#Returns a list of the latest tweets from all users
-		#@global_tweets = Tweet.order("created_at DESC").limit(100).all
-		@global_tweets = Tweet.find_by_sql("SELECT tweets.text, tweets.user_id, tweets.created_at, users.handle FROM tweets
+		#Returns a list of the user ids, usernames, timestamps, and texts of the 100 latest tweets from all users, in descending order
+		@global_tweets = Tweet.find_by_sql("
+			SELECT tweets.text, tweets.user_id, tweets.created_at, users.handle FROM tweets
 			INNER JOIN users ON tweets.user_id = users.id
-			ORDER BY tweets.created_at desc")
+			ORDER BY tweets.created_at desc
+			LIMIT 100
+			")
 		erb :login
 	end
 end
