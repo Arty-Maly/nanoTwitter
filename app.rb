@@ -88,8 +88,8 @@ get "/" do
 		#Returns a list of the latest tweets from all users
 		@global_tweets = Tweet.order("created_at DESC").limit(100).all
 		#@global_tweets = Tweet.find_by_sql("SELECT tweets.text, tweets.created_at, users.handle FROM tweets
-			INNER JOIN users ON tweets.user_id = users.id
-			ORDER BY tweets.created_at desc")
+		#	INNER JOIN users ON tweets.user_id = users.id
+		#	ORDER BY tweets.created_at desc")
 		erb :login
 	end
 end
