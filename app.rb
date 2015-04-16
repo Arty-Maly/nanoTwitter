@@ -82,8 +82,11 @@ get "/" do
 		#@num_followed and @num_following display number of followers/followees of the user, respectively
 		@num_followers = Relationship.where(followed_id: session_id).length
 		@num_following = followees_relationships.length
-		
-		erb :main
+		@global_tweets = Tweet.find_by_sql("SELECT tweets.text, tweets.created_at, tweets.user_id, users.handle FROM tweets
+			INNER JOIN users ON tweets.user_id = users.id
+			ORDER BY tweets.created_at desc")
+		erb :login
+		#erb :main
 	else
 		#Returns a list of the latest tweets from all users
 		@global_tweets = Tweet.find_by_sql("SELECT tweets.text, tweets.created_at, tweets.user_id, users.handle FROM tweets
