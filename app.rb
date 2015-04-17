@@ -209,15 +209,25 @@ end
 
 #Returns a list of a user's followers.
 get "/followers" do
-	follower_ids = Relationship.where(followed_id: params[:userid]).pluck(:follower_id)
-	@followers = User.where(id: follower_ids)
+	#Queries the database for the handle and id of all users that follow this page's displayed user by performing a join between
+	#the relationships and users tables.
+	@followers = Relationship.find_by_sql("SELECT users.handle, users.id FROM relationships 
+		INNER JOIN users ON relationships.follower_id = users.id
+		WHERE relationships.followed_id = #{params[:userid]}
+		ORDER BY relationships.created_at desc
+		")
 	erb :followers, :locals => {:userid => params[:userid]}
 end
 
 #Returns a list of a user's followees.
 get "/followees" do
-	followee_ids = Relationship.where(follower_id: params[:userid]).pluck(:followed_id)
-	@followees = User.where(id: followee_ids)
+	#Queries the database for the handle and id of all users that are followed by this page's displayed user by 
+	#performing a join between the relationships and users tables.
+	@followees = Relationship.find_by_sql("SELECT users.handle, users.id FROM relationships 
+		INNER JOIN users ON relationships.followed_id = users.id
+		WHERE relationships.follower_id = #{params[:userid]}
+		ORDER BY relationships.created_at desc
+		")
 	erb :followees, :locals => {:userid => params[:userid]}
 end
 
