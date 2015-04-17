@@ -1,6 +1,6 @@
 require 'minitest/autorun'
 require 'rack/test'
-require_relative '../app.rb'
+require File.expand_path(File.join(File.dirname(__FILE__), "../app.rb"))
 set :environment, :test
 
 describe "follow" do
