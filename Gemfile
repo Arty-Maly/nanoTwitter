@@ -7,6 +7,7 @@ gem "shotgun"
 gem 'bcrypt'
 gem "sinatra-flash"
 gem 'rack-flash3'
+gem 'rack-test'
 
 gem 'faker'
 gem 'rake'
