@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="/bootstrap.min.css">
   <link rel="stylesheet" href="/bootstrap-theme.min.css">
   <link rel="stylesheet" href="/menus.css">
-  <link rel="stylesheet" href="/look.css">
+	<link rel="stylesheet" href="/cards.css">
 </head>
 
 <body>
@@ -52,24 +52,26 @@
           </form>
       <% end %>
     <% end %>
+		
   </div>
 
-	<span id="tweet-list">
-		<h4>This User's Tweets</h4>
-		<ul>
-			<% @tweets.each do |tweet| %>
-				<!-- This line of code triggers the modal, and should trigger to show the user's profile -->
-				<li data-toggle="modal" data-target="#myModal">
-					<img src="http://lorempixum.com/100/100/nature/1">
-					<p>
-						<!-- this should be the @usertag -->
-						<a href="/user/<%=userid%>">@<%=@username %></a>
-						<br><a><%= Time.at(tweet.created_at) %></a>
-					</p>
-					<p> <%= tweet.text %> </p>
-				</li>
-			<% end %>
-		</ul>
-	</span>
-
+	<div class="content">
+		<span id="tweet-list">
+			<h4>This User's Tweets</h4>
+			<ul>
+				<% @tweets.each do |tweet| %>
+					<!-- This line of code triggers the modal, and should trigger to show the user's profile -->
+					<li data-toggle="modal" data-target="#myModal">
+						<img src="http://lorempixum.com/100/100/nature/1">
+						<p>
+							<!-- this should be the @usertag -->
+							<a href="/user/<%=userid%>">@<%=@username %></a>
+							<br><a><%= Time.at(tweet.created_at) %></a>
+						</p>
+						<p> <%= tweet.text %> </p>
+					</li>
+				<% end %>
+			</ul>
+		</span>
+	</div>
 </body>
