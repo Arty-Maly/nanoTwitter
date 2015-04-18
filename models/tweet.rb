@@ -1,18 +1,16 @@
 class Tweet < ActiveRecord::Base
 	belongs_to :user
 
-	def self.tweet_search(text)
-
-		puts"========================================================="
-		puts text
-		return self.limit(20).order("id desc").where('text LIKE ?', "%#{text}%")
-
+	#Returns a list of the user ids, usernames, timestamps, and texts of the 100 latest tweets 
+	#containing a given phrase, in descending order
+	def self.search_latest_tweets(text)
+		self.find_by_sql("
+		SELECT tweets.text, tweets.user_id, tweets.created_at, users.handle FROM tweets
+		INNER JOIN users ON tweets.user_id = users.id
+		WHERE tweets.text LIKE '%#{text}%'
+		ORDER BY tweets.created_at desc
+		LIMIT 100
+		")
 	end
 
-	def self.timeline_search(user_id)
-
-
-	return self.limit(5).order("id desc").where(user_id: user_id)
-
-	end
 end

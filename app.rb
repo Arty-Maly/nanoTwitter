@@ -32,8 +32,13 @@ helpers do
 	def go_to_profile
 		if login?
 			session_id = User.where(handle: session[:username]).first.id
-			followee_ids = Relationship.where(follower_id: session_id).pluck(:followed_id)
-			@followees = User.where(id: followee_ids)
+			#Queries the database for the handle and id of all users that are followed by the session user by 
+			#performing a join between the relationships and users tables.
+			@followees = Relationship.find_by_sql("SELECT users.handle, users.id FROM relationships 
+				INNER JOIN users ON relationships.followed_id = users.id
+				WHERE relationships.follower_id = #{session_id}
+				ORDER BY relationships.created_at desc
+				")
 			erb :profile
 		else
 			erb :login
@@ -60,24 +65,19 @@ end
 
 #Get method for the main page
 get "/" do 
-	#Returns a list of the user ids, usernames, timestamps, and texts of the 100 latest tweets from all users, in descending order
-	@global_tweets = Tweet.find_by_sql("
-		SELECT tweets.text, tweets.user_id, tweets.created_at, users.handle FROM tweets
-		INNER JOIN users ON tweets.user_id = users.id
-		ORDER BY tweets.created_at desc
-		LIMIT 100
-		")
+	#Returns a list of tweets from all users in descending order
+	@global_tweets = Tweet.search_latest_tweets("")
 		
 	if login?
 		#timeline_ids is a list of the ids of a user's followers and the user themselves.
 		#Rather than a ruby list, this is a concatenated string, in order to mimic SQL syntax
 		
 		#Adds the user's id
-		session_id = User.where(handle: session[:username]).first.id
-		timeline_ids = session_id.to_s
+		@session_id = User.where(handle: session[:username]).first.id
+		timeline_ids = @session_id.to_s
 		
 		#Adds followed users' ids to the list
-		followees_relationships = Relationship.where(follower_id: session_id)
+		followees_relationships = Relationship.where(follower_id: @session_id)
 		followees = followees_relationships.pluck(:followed_id)
 		followees.each do |followee|
 			timeline_ids = "#{timeline_ids} , #{followee.to_s}"
@@ -93,7 +93,7 @@ get "/" do
 			")
 		
 		#@num_followed and @num_following display number of followers/followees of the user, respectively
-		@num_followers = Relationship.where(followed_id: session_id).length
+		@num_followers = Relationship.count_followers(@session_id)
 		@num_following = followees_relationships.length
 		
 		erb :main
@@ -160,7 +160,7 @@ end
 #Searches for tweets based on an inputted string. Redirects to a search result page with every tweet
 #that has that string as part of its text.
 post "/tweet_search" do 
-	@search_results = Tweet.tweet_search(params[:tweet_search])
+	@search_results = Tweet.search_latest_tweets(params[:tweet_search])
 	erb :search
 end
 
@@ -185,8 +185,15 @@ get "/user/:userid" do
 		end
 		
 		#@num_followers and @num_following display number of followers/followees of the profile owner
-		@num_followers = Relationship.where(followed_id: profile_user_id).length
-		@num_following = Relationship.where(follower_id: profile_user_id).length
+		@num_followers = Relationship.count_followers(profile_user_id)
+		@num_following = Relationship.count_followees(profile_user_id)
+		
+		
+		#This returns the 100 latest tweets from this user.
+		@tweets = Tweet.limit(100).order("created_at DESC").where(user_id: profile_user_id)
+		
+		#This gives us the username of the profile user
+		@username = User.find(profile_user_id).handle
 		
 		erb :look, :locals => {:userid => params[:userid]}
 	end
@@ -213,28 +220,20 @@ post "/unfollow" do
   redirect "/user/#{params[:userid]}"
 end
 
-#Returns a list of a user's followers.
+#Displays a list of a user's followers.
 get "/followers" do
-	#Queries the database for the handle and id of all users that follow this page's displayed user by performing a join between
-	#the relationships and users tables.
-	@followers = Relationship.find_by_sql("SELECT users.handle, users.id FROM relationships 
-		INNER JOIN users ON relationships.follower_id = users.id
-		WHERE relationships.followed_id = #{params[:userid]}
-		ORDER BY relationships.created_at desc
-		")
-	erb :followers, :locals => {:userid => params[:userid]}
+	id = params[:userid]
+	@followers = Relationship.find_followers(id)
+	
+	erb :followers, :locals => {:userid => id}
 end
 
-#Returns a list of a user's followees.
+#Displays a list of a user's followees.
 get "/followees" do
-	#Queries the database for the handle and id of all users that are followed by this page's displayed user by 
-	#performing a join between the relationships and users tables.
-	@followees = Relationship.find_by_sql("SELECT users.handle, users.id FROM relationships 
-		INNER JOIN users ON relationships.followed_id = users.id
-		WHERE relationships.follower_id = #{params[:userid]}
-		ORDER BY relationships.created_at desc
-		")
-	erb :followees, :locals => {:userid => params[:userid]}
+	id = params[:userid]
+	@followees = Relationship.find_followees(id)
+	
+	erb :followees, :locals => {:userid => id}
 end
 
 

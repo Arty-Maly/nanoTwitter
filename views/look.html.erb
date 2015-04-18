@@ -33,7 +33,7 @@
   </nav>
 
   <div id="profile-box" class="containter left content">
-    <h2> @<%= user = User.find(userid).handle %>'s Profile
+    <h2> @<%= @username %>'s Profile
       <a href="/followers?userid=<%=userid%>">Followers: <%= @num_followers %> Users</a>
 	    <a href="/followees?userid=<%=userid%>">Following: <%= @num_following %> Users</a>
     </h2>
@@ -52,19 +52,24 @@
           </form>
       <% end %>
     <% end %>
-    
-
-    <h3> Your Recent Tweets </h3>
-    <br>
-      <!-- get 5 records starting from last record where id = user_id -->
-    <ul>
-      <% t = Tweet.timeline_search(userid) %>  
-      <% t.each do |elem| %>
-      <li><p><%= elem.text %></p></li>
-      <br>
-      <% end %>
-    </ul>
   </div>
 
+	<span id="tweet-list">
+		<h4>This User's Tweets</h4>
+		<ul>
+			<% @tweets.each do |tweet| %>
+				<!-- This line of code triggers the modal, and should trigger to show the user's profile -->
+				<li data-toggle="modal" data-target="#myModal">
+					<img src="http://lorempixum.com/100/100/nature/1">
+					<p>
+						<!-- this should be the @usertag -->
+						<a href="/user/<%=userid%>">@<%=@username %></a>
+						<br><a><%= Time.at(tweet.created_at) %></a>
+					</p>
+					<p> <%= tweet.text %> </p>
+				</li>
+			<% end %>
+		</ul>
+	</span>
 
 </body>

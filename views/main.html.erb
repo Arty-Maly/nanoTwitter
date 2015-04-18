@@ -1,9 +1,6 @@
 <% flash.each do |msg| %>
 <%= msg[1] %>
 <% end %>
-<!-- get th user id -->
-<% u = User.where(handle: username) %>
-<% id = u[0].id %>
 
 <head>
   <link rel="stylesheet" href="/main.css">
@@ -43,8 +40,8 @@
     <div id="user-quick-profile">
       <h2>
         <span> @<%= username %> </span>
-        <span><a href="/followers?userid=<%=id%>">You have <%= @num_followers %> Followers</a></span>
-        <span><a href="/followees?userid=<%=id%>">You are following <%= @num_following %> users</a></span>
+        <span><a href="/followers?userid=<%=@session_id%>">You have <%= @num_followers %> Followers</a></span>
+        <span><a href="/followees?userid=<%=@session_id%>">You are following <%= @num_following %> users</a></span>
       </h2>
     </div>
       <!-- content -->
