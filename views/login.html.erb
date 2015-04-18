@@ -136,19 +136,19 @@
 	<h3>Tweets By Everyone </h3>
 	<div id="tweet-list" class="container">
 	    <ul>
-	      <% @global_tweets.each do |elem| %>
+	      <% @global_tweets.each do |tweet| %>
 
 	        <!-- This line of code triggers the modal, and should trigger to show the user's profile -->
 	        <li data-toggle="modal" data-target="#myModal">
 	          <img src="http://lorempixum.com/100/100/nature/1">
 	          <p>
 	            <!-- this should be the Username that is public -->
-	            <a href="/user/<%=elem.user_id%>">Username</a>
+	            <a href="/user/<%=tweet.user_id%>">Username</a>
 	            <!-- this should be the @usertag -->
-	            <a href="/user/<%=elem.user_id%>">@<%=elem.handle %></a>
+	            <a href="/user/<%=tweet.user_id%>">@<%=tweet.handle %></a>
 	            <a>timestamp</a>
 	          </p>
-	          <p> <%= elem.text %> </p>
+	          <p> <%= tweet.text %> </p>
 	        </li>
 	      <% end %>
 	    </ul>

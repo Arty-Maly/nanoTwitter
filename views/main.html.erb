@@ -60,15 +60,19 @@
     <span id="tweet-list">
       <h4> Recent Tweets By You and The People You Follow </h4>
       <ul>
-        <% @followee_tweets.each do |elem| %>
-          <li data-toggle="modal" data-target="#myModal">
-            <img src="http://lorempixum.com/100/100/nature/1">
+        <% @followee_tweets.each do |tweet| %>
+        <!-- This line of code triggers the modal, and should trigger to show the user's profile -->
+        <li data-toggle="modal" data-target="#myModal">
+          <img src="http://lorempixum.com/100/100/nature/1">
             <p>
-              <%= elem.text %>
-              <a href="/user/<%=elem.user_id%>">@<%=User.find(elem.user_id).handle %></a>
+              <!-- this should be the Username that is public -->
+              <a href="/user/<%=tweet.user_id%>">Username</a>
+              <!-- this should be the @usertag -->
+              <a href="/user/<%=tweet.user_id%>">@<%=tweet.handle %></a>
               <a>timestamp</a>
             </p>
-          </li>
+            <p> <%= tweet.text %> </p>
+        </li>
         <% end %>
       </ul>
     </span>
@@ -76,19 +80,18 @@
     <span id="tweet-list">
       <h4> Global Tweets </h4>
       <ul>
-        <% t = Tweet.order("created_at DESC").limit(100).all %>
-        <% t.each do |elem| %>
+        <% @global_tweets.each do |tweet| %>
         <!-- This line of code triggers the modal, and should trigger to show the user's profile -->
         <li data-toggle="modal" data-target="#myModal">
           <img src="http://lorempixum.com/100/100/nature/1">
             <p>
               <!-- this should be the Username that is public -->
-              <a href="/user/<%=elem.user_id%>">Username</a>
+              <a href="/user/<%=tweet.user_id%>">Username</a>
               <!-- this should be the @usertag -->
-              <a href="/user/<%=elem.user_id%>">@<%=User.find(elem.user_id).handle %></a>
+              <a href="/user/<%=tweet.user_id%>">@<%=tweet.handle %></a>
               <a>timestamp</a>
             </p>
-            <p> <%= elem.text %> </p>
+            <p> <%= tweet.text %> </p>
         </li>
         <% end %>
       </ul>

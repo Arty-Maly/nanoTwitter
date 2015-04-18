@@ -60,24 +60,37 @@ end
 
 #Get method for the main page
 get "/" do 
+	#Returns a list of the user ids, usernames, timestamps, and texts of the 100 latest tweets from all users, in descending order
+	@global_tweets = Tweet.find_by_sql("
+		SELECT tweets.text, tweets.user_id, tweets.created_at, users.handle FROM tweets
+		INNER JOIN users ON tweets.user_id = users.id
+		ORDER BY tweets.created_at desc
+		LIMIT 100
+		")
+		
 	if login?
-		#Creates a list of the ids of a user's followers and the user themselves.
-		timeline_ids = []
+		#timeline_ids is a list of the ids of a user's followers and the user themselves.
+		#Rather than a ruby list, this is a concatenated string, in order to mimic SQL syntax
 		
 		#Adds the user's id
 		session_id = User.where(handle: session[:username]).first.id
-		timeline_ids.push(session_id)
+		timeline_ids = session_id.to_s
 		
 		#Adds followed users' ids to the list
 		followees_relationships = Relationship.where(follower_id: session_id)
 		followees = followees_relationships.pluck(:followed_id)
 		followees.each do |followee|
-			timeline_ids.push(followee)
+			timeline_ids = "#{timeline_ids} , #{followee.to_s}"
 		end
-
-		#Retrieves the followees' tweets, ordered from most recent to oldest
-		@followee_tweets = Tweet.order("created_at DESC").where(user_id: timeline_ids)
 		
+		#Retrieves the last 100 followees' tweets, ordered from most recent to oldest
+		@followee_tweets = Tweet.find_by_sql("
+			SELECT tweets.text, tweets.user_id, tweets.created_at, users.handle FROM tweets
+			INNER JOIN users ON tweets.user_id = users.id
+			WHERE tweets.user_id IN (#{timeline_ids})
+			ORDER BY tweets.created_at desc
+			LIMIT 100
+			")
 		
 		#@num_followed and @num_following display number of followers/followees of the user, respectively
 		@num_followers = Relationship.where(followed_id: session_id).length
@@ -85,13 +98,6 @@ get "/" do
 		
 		erb :main
 	else
-		#Returns a list of the user ids, usernames, timestamps, and texts of the 100 latest tweets from all users, in descending order
-		@global_tweets = Tweet.find_by_sql("
-			SELECT tweets.text, tweets.user_id, tweets.created_at, users.handle FROM tweets
-			INNER JOIN users ON tweets.user_id = users.id
-			ORDER BY tweets.created_at desc
-			LIMIT 100
-			")
 		erb :login
 	end
 end
