@@ -31,11 +31,11 @@
     </div>
   </nav>
 
+	<div class="content">
   <h1> Who is being followed by @<%= user = User.find(userid).handle %>? </h1>
 	<% @followees.each do |followee| %>
-      <a href="/user/<%=followee.id%>">@<%=followee.handle %></a>
-      <br>
+      <h4><a href="/user/<%=followee.id%>">@<%=followee.handle %></a></h4>
   <% end %>
-		
-  <br>
+	</div>
+	
 </body>
