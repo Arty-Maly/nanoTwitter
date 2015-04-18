@@ -10,6 +10,10 @@
 	text-align: left;
 }
 
+li { 
+	border-bottom: 1px dashed blue;
+}
+
 h3 {
 	text-align: center;
 	padding: 10px 10px 10px 10px;

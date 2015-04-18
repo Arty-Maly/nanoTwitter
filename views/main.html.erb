@@ -65,11 +65,9 @@
         <li data-toggle="modal" data-target="#myModal">
           <img src="http://lorempixum.com/100/100/nature/1">
             <p>
-              <!-- this should be the Username that is public -->
-              <a href="/user/<%=tweet.user_id%>">Username</a>
               <!-- this should be the @usertag -->
               <a href="/user/<%=tweet.user_id%>">@<%=tweet.handle %></a>
-              <a>timestamp</a>
+              <br><a><%= Time.at(tweet.created_at) %></a>
             </p>
             <p> <%= tweet.text %> </p>
         </li>
@@ -85,11 +83,9 @@
         <li data-toggle="modal" data-target="#myModal">
           <img src="http://lorempixum.com/100/100/nature/1">
             <p>
-              <!-- this should be the Username that is public -->
-              <a href="/user/<%=tweet.user_id%>">Username</a>
               <!-- this should be the @usertag -->
               <a href="/user/<%=tweet.user_id%>">@<%=tweet.handle %></a>
-              <a>timestamp</a>
+              <br><a><%= Time.at(tweet.created_at) %></a>
             </p>
             <p> <%= tweet.text %> </p>
         </li>

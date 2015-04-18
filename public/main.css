@@ -13,6 +13,9 @@ div, textarea, table, td, th, code, pre, samp {
     word-wrap: break-word;
 }
 
+li { 
+	border-bottom: 1px dashed blue;
+}
 
 .left {
     float: left;
