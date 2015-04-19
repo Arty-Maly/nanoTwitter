@@ -8,8 +8,7 @@ gem 'bcrypt'
 gem "sinatra-flash"
 gem 'rack-flash3'
 gem 'rack-test'
-gem 'thin'
-
+gem 'puma'
 gem 'faker'
 gem 'rake'
 
