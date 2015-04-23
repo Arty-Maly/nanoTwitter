@@ -12,10 +12,7 @@ gem 'puma'
 gem 'faker'
 gem 'rake'
 
-group :test do
-	gem 'sqlite3'
-end
-group :development do
+group :development, :test do
 	gem 'sqlite3'
 end
 group :production do
