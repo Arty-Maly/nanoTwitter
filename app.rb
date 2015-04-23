@@ -5,10 +5,12 @@ require './models/tweet'
 require './models/relationship'
 require 'bcrypt'
 require 'sinatra/flash'
-
+require "./config/redis"
 enable :sessions
 
 Tilt.register Tilt::ERBTemplate, 'html.erb'
+
+
 
 
 #helper methods for the rest of the code 
@@ -67,7 +69,7 @@ end
 get "/" do 
 	#Returns a list of tweets from all users in descending order
 	@global_tweets = Tweet.search_latest_tweets("")
-		
+	
 	if login?
 		#timeline_ids is a list of the ids of a user's followers and the user themselves.
 		#Rather than a ruby list, this is a concatenated string, in order to mimic SQL syntax

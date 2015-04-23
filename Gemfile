@@ -11,7 +11,7 @@ gem 'rack-test'
 gem 'puma'
 gem 'faker'
 gem 'rake'
-
+gem 'redis'
 group :test do
 	gem 'sqlite3'
 end
