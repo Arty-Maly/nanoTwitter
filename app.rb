@@ -192,7 +192,10 @@ get "/user/:userid" do
 		
 		
 		#This returns the 100 latest tweets from this user.
-		@tweets = Tweet.limit(100).order("created_at DESC").where(user_id: profile_user_id)
+		@tweets = Tweet.find_by_sql("SELECT tweets.text, tweets.created_at FROM tweets
+			WHERE tweets.user_id = #{profile_user_id}
+			ORDER BY created_at DESC
+			LIMIT 100")
 		
 		#This gives us the username of the profile user
 		@username = User.find(profile_user_id).handle
