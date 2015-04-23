@@ -21,7 +21,6 @@ users.each_line do |line|
 	hash[:password] = password
 	User.create(hash)
 	i +=1
-	puts "user" + i.to_s 
 end
 i = 1
 
@@ -32,9 +31,6 @@ tweets.each_line do |line|
 	tweet = User.find(split[0].delete!(",")).tweets.create(text: split[1], user_id: split[0])
 	tweet.created_at = (split[2].delete!(",")[0..-7])
 	tweet.save
-	
-
-	puts "tweet" + i.to_s
 	
 	i+=1
 
