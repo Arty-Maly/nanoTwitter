@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150320010729) do
+ActiveRecord::Schema.define(version: 20150423162745) do
 
   create_table "relationships", force: :cascade do |t|
     t.integer  "follower_id"
@@ -30,6 +30,8 @@ ActiveRecord::Schema.define(version: 20150320010729) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  add_index "tweets", ["created_at"], name: "index_tweets_on_created_at"
 
   create_table "users", force: :cascade do |t|
     t.string   "handle"
