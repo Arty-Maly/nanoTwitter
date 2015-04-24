@@ -6,12 +6,37 @@ require './models/relationship'
 require 'bcrypt'
 require 'sinatra/flash'
 require "./config/redis"
+require 'json'
 enable :sessions
 
 Tilt.register Tilt::ERBTemplate, 'html.erb'
+REDIS.flushdb
+@needs_refresh = false
 
+@global = Tweet.search_latest_tweets("")
+@global.each do |tweet|
+	hash = Hash.new
+	hash[:user_id] = tweet.user_id
+	hash[:handle] = tweet.handle
+	hash[:text] = tweet.text
+	hash[:created_at] = tweet.created_at
 
+	REDIS.lpush("mylist", hash.to_json)
 
+end
+
+# def initialize
+# 	i=1
+# 	REDIS.flushdb
+	
+# 	 hundred_tweets = Tweet.search_latest_tweets("")
+		
+# 		REDIS.set(i, hundred_tweets[0].text)
+
+# 		i+=1
+	
+	 
+# end
 
 #helper methods for the rest of the code 
 helpers do
@@ -69,7 +94,7 @@ end
 get "/" do 
 	#Returns a list of tweets from all users in descending order
 	@global_tweets = Tweet.search_latest_tweets("")
-	
+
 	if login?
 		#timeline_ids is a list of the ids of a user's followers and the user themselves.
 		#Rather than a ruby list, this is a concatenated string, in order to mimic SQL syntax

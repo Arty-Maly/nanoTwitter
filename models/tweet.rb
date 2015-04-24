@@ -11,6 +11,7 @@ class Tweet < ActiveRecord::Base
 		ORDER BY tweets.created_at desc
 		LIMIT 100
 		")
+	
 	end
 
 end
