@@ -24,7 +24,7 @@ REDIS.flushdb
 	REDIS.lpush("mylist", hash.to_json)
 
 end
-
+##############################
 # def initialize
 # 	i=1
 # 	REDIS.flushdb
