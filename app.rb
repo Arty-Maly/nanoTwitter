@@ -11,7 +11,7 @@ enable :sessions
 
 Tilt.register Tilt::ERBTemplate, 'html.erb'
 	
-		#Dont touch this for now. >>>>>>>>>>>>>>>>
+		#Dont touch this for now. >>>>>>>>>>>>>>>>>>>>>
 		#probs should go into a helper method
 		#on initialize flush redis db and recreate top 100 latest tweets
 		REDIS.flushdb
