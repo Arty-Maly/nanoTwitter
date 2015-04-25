@@ -136,7 +136,7 @@
 	<h3>Tweets By Everyone </h3>
 	<div id="tweet-list" class="container">
 	    <ul>
-	      <% REDIS.lrange("mylist",0,100).reverse_each do |tweet| %>
+	      <% REDIS.lrange("latest100",0,100).reverse_each do |tweet| %>
             <% parse = JSON.parse(tweet)%>
 	        <!-- This line of code triggers the modal, and should trigger to show the user's profile -->
 	        <li data-toggle="modal" data-target="#myModal">

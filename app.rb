@@ -10,33 +10,22 @@ require 'json'
 enable :sessions
 
 Tilt.register Tilt::ERBTemplate, 'html.erb'
-REDIS.flushdb
-@needs_refresh = false
-
-@global = Tweet.search_latest_tweets("")
-@global.each do |tweet|
-	hash = Hash.new
-	hash[:user_id] = tweet.user_id
-	hash[:handle] = tweet.handle
-	hash[:text] = tweet.text
-	hash[:created_at] = tweet.created_at
-
-	REDIS.lpush("mylist", hash.to_json)
-
-end
-
-# def initialize
-# 	i=1
-# 	REDIS.flushdb
 	
-# 	 hundred_tweets = Tweet.search_latest_tweets("")
-		
-# 		REDIS.set(i, hundred_tweets[0].text)
+		#Dont touch this for now. >>>>>>>>>>>>>>>>
+		#probs should go into a helper method
+		#on initialize flush redis db and recreate top 100 latest tweets
+		REDIS.flushdb
+		@global = Tweet.search_latest_tweets("")
+		@global.each do |tweet|
+			hash = Hash.new
+			hash[:user_id] = tweet.user_id
+			hash[:handle] = tweet.handle
+			hash[:text] = tweet.text
+			hash[:created_at] = tweet.created_at
 
-# 		i+=1
-	
-	 
-# end
+			REDIS.lpush("latest100", hash.to_json)
+		end
+	#<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 #helper methods for the rest of the code 
 helpers do
@@ -71,6 +60,42 @@ helpers do
 			erb :login
 		end
 	end
+#constructing the redis list for a user top 100 tweets of who he follows
+	def redis_list_for_user(user, timeline_ids)
+		
+		#Retrieves the last 100 followees' tweets, ordered from most recent to oldest
+		followee_tweets = Tweet.find_by_sql("
+			SELECT tweets.text, tweets.user_id, tweets.created_at, users.handle FROM tweets
+			INNER JOIN users ON tweets.user_id = users.id
+			WHERE tweets.user_id IN (#{timeline_ids})
+			ORDER BY tweets.created_at desc
+			LIMIT 100
+			")
+		followee_tweets.each do |tweet|
+			hash = Hash.new
+			hash[:user_id] = followee_tweets.user_id
+			hash[:handle] = followee_tweets.handle
+			hash[:text] = followee_tweets.text
+			hash[:created_at] = followee_tweets.created_at
+			REDIS.lpush(user, hash.to_json)
+		end
+		REDIS.expire(user, 120)
+	end
+#list of tweets from a user
+	def redis_personal_list_for_user(user, profile_user_id)
+		tweets = Tweet.find_by_sql("SELECT tweets.text, tweets.created_at FROM tweets
+			WHERE tweets.user_id = #{profile_user_id}
+			ORDER BY created_at DESC
+			LIMIT 100")
+		tweets.each do |tweet|
+			hash = Hash.new
+			hash[:text] = tweet.text
+			hash[:created_at] = tweet.created_at
+			REDIS.lpush(user, hash.to_json)
+		end
+		REDIS.expire(user, 120)
+
+	end
   
 end
 
@@ -89,7 +114,7 @@ get '/loaderio-5f5ecc0ac53eec6834d377dbb3605118/' do
 	"loaderio-5f5ecc0ac53eec6834d377dbb3605118"
 end
 
-
+############################################################################################################################################
 #Get method for the main page
 get "/" do 
 	#Returns a list of tweets from all users in descending order
@@ -110,14 +135,12 @@ get "/" do
 			timeline_ids = "#{timeline_ids} , #{followee.to_s}"
 		end
 		
-		#Retrieves the last 100 followees' tweets, ordered from most recent to oldest
-		@followee_tweets = Tweet.find_by_sql("
-			SELECT tweets.text, tweets.user_id, tweets.created_at, users.handle FROM tweets
-			INNER JOIN users ON tweets.user_id = users.id
-			WHERE tweets.user_id IN (#{timeline_ids})
-			ORDER BY tweets.created_at desc
-			LIMIT 100
-			")
+		
+		if REDIS.exists(session[:username]) == false
+			redis_list_for_user(session[:username], timeline_ids)
+		end
+		
+				
 		
 		#@num_followed and @num_following display number of followers/followees of the user, respectively
 		@num_followers = Relationship.count_followers(@session_id)
@@ -133,9 +156,11 @@ end
 post "/login" do
 	handle = params[:username]
 	user = User.where(handle: handle).first
+
   
 	if user && user.password_hash == BCrypt::Engine.hash_secret(params[:password], user.password_salt)
 		session[:username] = handle
+		session[:id] = user.id
 		redirect "/"
 	end
   
@@ -215,15 +240,15 @@ get "/user/:userid" do
 		@num_followers = Relationship.count_followers(profile_user_id)
 		@num_following = Relationship.count_followees(profile_user_id)
 		
-		
+		@username = User.find(profile_user_id).handle
 		#This returns the 100 latest tweets from this user.
-		@tweets = Tweet.find_by_sql("SELECT tweets.text, tweets.created_at FROM tweets
-			WHERE tweets.user_id = #{profile_user_id}
-			ORDER BY created_at DESC
-			LIMIT 100")
+		if REDIS.exists("personal_"+@username) == false
+			redis_personal_list_for_user("personal_"+@username, profile_user_id)
+		end
+		
 		
 		#This gives us the username of the profile user
-		@username = User.find(profile_user_id).handle
+		
 		
 		erb :look, :locals => {:userid => params[:userid]}
 	end

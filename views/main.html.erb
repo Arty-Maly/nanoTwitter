@@ -57,16 +57,17 @@
     <span id="tweet-list">
       <h4> Recent Tweets By You and The People You Follow </h4>
       <ul>
-        <% @followee_tweets.each do |tweet| %>
+        <% REDIS.lrange(session[:username],0,100).reverse_each do |tweet|  %>
+        <% parse = JSON.parse(tweet)%>
         <!-- This line of code triggers the modal, and should trigger to show the user's profile -->
         <li data-toggle="modal" data-target="#myModal">
           <img src="http://lorempixum.com/100/100/nature/1">
             <p>
               <!-- this should be the @usertag -->
-              <a href="/user/<%=tweet.user_id%>">@<%=tweet.handle %></a>
-              <br><a><%= Time.at(tweet.created_at) %></a>
+              <a href="/user/<%=parse["user_id"]%>">@<%=parse["handle"] %></a>
+              <br><a><%= parse["created_at"] %></a>
             </p>
-            <p> <%= tweet.text %> </p>
+            <p> <%= parse["text"] %> </p>
         </li>
         <% end %>
       </ul>
