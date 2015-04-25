@@ -83,6 +83,7 @@ helpers do
 	end
 #list of tweets from a user
 	def redis_personal_list_for_user(user, profile_user_id)
+		
 		tweets = Tweet.find_by_sql("SELECT tweets.text, tweets.created_at FROM tweets
 			WHERE tweets.user_id = #{profile_user_id}
 			ORDER BY created_at DESC
@@ -91,10 +92,22 @@ helpers do
 			hash = Hash.new
 			hash[:text] = tweet.text
 			hash[:created_at] = tweet.created_at
+		
+
 			REDIS.lpush(user, hash.to_json)
 		end
 		REDIS.expire(user, 120)
 
+	end
+
+	def redis_relationship_numbers_for_a_user(user, profile_user_id)
+		#@num_followers and @num_following display number of followers/followees of the profile owner
+		num_followers = Relationship.count_followers(profile_user_id)
+		num_following = Relationship.count_followees(profile_user_id)
+		REDIS.set(user+"_num_followers", num_followers)
+		REDIS.set(user+"_num_following", num_following)
+		REDIS.expire(user+"_num_followers", 120)
+		REDIS.expire(user+"_num_following", 120)
 	end
   
 end
@@ -236,14 +249,15 @@ get "/user/:userid" do
 			end
 		end
 		
-		#@num_followers and @num_following display number of followers/followees of the profile owner
-		@num_followers = Relationship.count_followers(profile_user_id)
-		@num_following = Relationship.count_followees(profile_user_id)
+		
 		
 		@username = User.find(profile_user_id).handle
 		#This returns the 100 latest tweets from this user.
 		if REDIS.exists("personal_"+@username) == false
 			redis_personal_list_for_user("personal_"+@username, profile_user_id)
+		end
+		if REDIS.exists(@username+"_num_followers") == false
+			redis_relationship_numbers_for_a_user(@username+"_num_followers", profile_user_id)
 		end
 		
 		

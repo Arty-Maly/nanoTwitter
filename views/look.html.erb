@@ -34,8 +34,8 @@
 
   <div id="profile-box" class="containter left content">
     <h2> @<%= @username %>'s Profile
-      <a href="/followers?userid=<%=userid%>">Followers: <%= @num_followers %> Users</a>
-	    <a href="/followees?userid=<%=userid%>">Following: <%= @num_following %> Users</a>
+      <a href="/followers?userid=<%=userid%>">Followers: <%= REDIS.get(@username+"_num_followers") %> Users</a>
+	    <a href="/followees?userid=<%=userid%>">Following: <%= REDIS.get(@username+"_num_following") %> Users</a>
     </h2>
 
     <% if login? && userid.to_i != @session_id %>
