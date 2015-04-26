@@ -7,6 +7,10 @@ require 'bcrypt'
 require 'sinatra/flash'
 require "./config/redis"
 require 'json'
+
+#Faker is used for the test uris
+require 'faker'
+
 enable :sessions
 
 Tilt.register Tilt::ERBTemplate, 'html.erb'
@@ -295,7 +299,64 @@ get "/followees" do
 	erb :followees, :locals => {:userid => id}
 end
 
-
+#################################
 #Routes necessary for final tests
-get "/test/setup" do
+#################################
+
+#Creates test_user if it doesn't exist
+#test_user's password is 1
+#Redirects to the test_uri page for manual testing
+get "/test_setup" do
+	if User.where(handle: "test_user").first == nil
+		tester = User.new({:handle => "test_user", :password => "1"})
+		tester.save
+		puts "Tester created!"
+	end
+	erb :test_uris
 end
+
+#Creates a test tweet posted by test_user
+post "/test_tweet" do
+	text = Faker::Hacker.say_something_smart
+	User.where(handle: "test_user").first.tweet(text)
+end
+
+
+#Logs test_user in and redirects to the logged-in main root page.
+post "/test_main" do
+	user = User.where(handle: "test_user").first
+	session[:username] = "test_user"
+	session[:userid] = user.id
+	redirect "/"
+end
+
+#Has test_user follow/unfollow somebody at random
+post "/test_follow" do
+	#Finds test_user's id
+	tester = User.where(handle: "test_user").first
+	test_id = tester.id
+
+	#Selects a random user
+	followee = User.all.shuffle.first
+	followee_id = followee.id
+
+	#Determines what to do to the user depending on which user it is
+
+	#If the test_user is following the user, unfollow
+	if tester.active_relationships.where(followed_id: followee_id).first != nil
+		tester.unfollow(followee)
+	#Elsif the test_user is not trying to follow itself, follow 
+	elsif followee_id != test_id
+		tester.follow(followee)
+	end
+end
+
+#Resets the database after the test has concluded
+post "/reset" do
+	#Removes all of test_user's tweets
+	tester_id = User.where(handle: "test_user").first
+	Tweet.where(user_id: tester_id).delete_all
+	#Removes all of test_user's follows
+	Relationship.where(follower_id: tester_id).delete_all
+end
+
