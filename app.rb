@@ -97,7 +97,7 @@ helpers do
 			hash[:created_at] = Time.at(tweet.created_at).to_s
 			REDIS.lpush(name + "_personal", hash.to_json)
 		end
-		REDIS.expire(name, 120)
+		REDIS.expire(name + "_personal", 120)
 
 	end
 
