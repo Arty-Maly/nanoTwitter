@@ -54,11 +54,7 @@ helpers do
 		if login?
 			#Queries the database for the handle and id of all users that are followed by the session user by 
 			#performing a join between the relationships and users tables.
-			@followees = Relationship.find_by_sql("SELECT users.handle, users.id FROM relationships 
-				INNER JOIN users ON relationships.followed_id = users.id
-				WHERE relationships.follower_id = #{userid}
-				ORDER BY relationships.created_at desc
-				")
+			@followees = Relationship.find_followees(userid)
 			erb :profile
 		else
 			erb :login
@@ -66,17 +62,12 @@ helpers do
 	end
 
 	#Constructs a redis object that lists the last 100 tweets posted by the users with a given set of timeline ids
-	#The given set must be formatted in SQL syntax
 	#The name of the redis object is name+"_logged"
 	def create_cached_logged_in_timeline(name, timeline_ids)
 		#Retrieves the last 100 followees' tweets, ordered from most recent to oldest
-		followee_tweets = Tweet.find_by_sql("
-			SELECT tweets.text, tweets.user_id, tweets.created_at, users.handle FROM tweets
-			INNER JOIN users ON tweets.user_id = users.id
-			WHERE tweets.user_id IN (#{timeline_ids})
-			ORDER BY tweets.created_at desc
-			LIMIT 100
-			")
+		followee_tweets = Tweet.search_latest_tweets_by_users(timeline_ids)
+
+		#Creates a redis object for the list of followee tweets
 		followee_tweets.each do |tweet|
 			hash = Hash.new
 			hash[:user_id] = tweet.user_id
@@ -92,12 +83,10 @@ helpers do
 	#for a single user and saves them as a redis object
 	#The list is named "personal_"+name
 	def create_cached_personal_tweet_list(name, user_id)
-		#Queries the database for the text and timestamps of the 100 latest tweets
-		tweets = Tweet.find_by_sql("SELECT tweets.text, tweets.created_at FROM tweets
-			WHERE tweets.user_id = #{user_id}
-			ORDER BY created_at DESC
-			LIMIT 100")
+		#Queries the database for the 100 latest tweets by the given user
+		tweets = Tweet.search_latest_tweets_by_users([user_id])
 
+		#Constructs a REDIS object containing the text and timestamps of all the tweets by the given user
 		tweets.each do |tweet|
 			hash = Hash.new
 			hash[:text] = tweet.text
@@ -148,27 +137,21 @@ get "/" do
 	@global_tweets = Tweet.search_latest_tweets("")
 
 	if login?
-		#timeline_ids is a list of the ids of a user's followers and the user themselves.
-		#Rather than a ruby list, this is a concatenated string, in order to mimic SQL syntax
-		
-		#Adds the user's id
-		session_id = userid
-		timeline_ids = session_id.to_s
-		
-		#Adds followed users' ids to the list
-		followees_relationships = Relationship.where(follower_id: session_id)
-		followees = followees_relationships.pluck(:followed_id)
-		followees.each do |followee|
-			timeline_ids = "#{timeline_ids} , #{followee.to_s}"
-		end
-		
-		
+		followees_relationships = Relationship.where(follower_id: userid)
+
+		#Checks if a redis object containing the 100 most recent tweets by the logged-in user and its followers exists
+		#If not, a new one is constructed
 		if REDIS.exists(username+ "_timeline") == false
-			create_cached_logged_in_timeline(username, timeline_ids)
+			#Generates a list of all followed users' ids, which is used to retrieve the tweets of the user's followees
+			followees = followees_relationships.pluck(:followed_id)
+			#Adds the user's id to the list, so that its own tweets can be included in the list of tweets
+			followees.push(userid)
+			#Creates a cached redis object that contains the 100 most recent tweets by a user's followees
+			create_cached_logged_in_timeline(username, followees)
 		end	
 		
 		#@num_followed and @num_following display number of followers/followees of the user, respectively
-		@num_followers = Relationship.count_followers(session_id)
+		@num_followers = Relationship.count_followers(userid)
 		@num_following = followees_relationships.length
 		
 		erb :main
@@ -181,7 +164,6 @@ end
 post "/login" do
 	handle = params[:username]
 	user = User.where(handle: handle).first
-
   
 	if user && user.password_hash == BCrypt::Engine.hash_secret(params[:password], user.password_salt)
 		session[:username] = handle
