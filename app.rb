@@ -15,8 +15,8 @@ Tilt.register Tilt::ERBTemplate, 'html.erb'
 		#probs should go into a helper method
 		#on initialize flush redis db and recreate top 100 latest tweets
 		REDIS.flushdb
-		@global = Tweet.search_latest_tweets("")
-		@global.each do |tweet|
+		global_tweets = Tweet.search_latest_tweets("")
+		global_tweets.each do |tweet|
 			hash = Hash.new
 			hash[:user_id] = tweet.user_id
 			hash[:handle] = tweet.handle
@@ -31,28 +31,32 @@ Tilt.register Tilt::ERBTemplate, 'html.erb'
 helpers do
   
 	#Checks if the computer user is logged in
-  def login?
-    if session[:username].nil?
-      return false
-    else
-      return true
-    end
-  end
+  	def login?
+    	if username.nil? || userid.nil?
+      		return false
+    	else
+      		return true
+    	end
+  	end
   
 	#Returns the username of the current logged-in user
-  def username
-    return session[:username]
-  end
+  	def username
+    	return session[:username]
+  	end
 	
+	#Returns the user id of the current logged-in user
+  	def userid
+    	return session[:userid]
+  	end
+
 	#Redirects to the logged-in user's personal page
 	def go_to_profile
 		if login?
-			session_id = User.where(handle: session[:username]).first.id
 			#Queries the database for the handle and id of all users that are followed by the session user by 
 			#performing a join between the relationships and users tables.
 			@followees = Relationship.find_by_sql("SELECT users.handle, users.id FROM relationships 
 				INNER JOIN users ON relationships.followed_id = users.id
-				WHERE relationships.follower_id = #{session_id}
+				WHERE relationships.follower_id = #{userid}
 				ORDER BY relationships.created_at desc
 				")
 			erb :profile
@@ -60,9 +64,11 @@ helpers do
 			erb :login
 		end
 	end
-#constructing the redis list for a user top 100 tweets of who he follows
-	def redis_list_for_user(user, timeline_ids)
-		
+
+	#Constructs a redis object that lists the last 100 tweets posted by the users with a given set of timeline ids
+	#The given set must be formatted in SQL syntax
+	#The name of the redis object is name+"_logged"
+	def create_cached_logged_in_timeline(name, timeline_ids)
 		#Retrieves the last 100 followees' tweets, ordered from most recent to oldest
 		followee_tweets = Tweet.find_by_sql("
 			SELECT tweets.text, tweets.user_id, tweets.created_at, users.handle FROM tweets
@@ -73,41 +79,49 @@ helpers do
 			")
 		followee_tweets.each do |tweet|
 			hash = Hash.new
-			hash[:user_id] = followee_tweets.user_id
-			hash[:handle] = followee_tweets.handle
-			hash[:text] = followee_tweets.text
-			hash[:created_at] = followee_tweets.created_at
-			REDIS.lpush(user, hash.to_json)
+			hash[:user_id] = tweet.user_id
+			hash[:handle] = tweet.handle
+			hash[:text] = tweet.text
+			hash[:created_at] = tweet.created_at
+			REDIS.lpush(name + "_timeline", hash.to_json)
 		end
-		REDIS.expire(user, 120)
+		REDIS.expire(name + "_timeline", 120)
 	end
-#list of tweets from a user
-	def redis_personal_list_for_user(user, profile_user_id)
-		
+	
+	#produces the list of the text and timestamps of the 100 latest tweets 
+	#for a single user and saves them as a redis object
+	#The list is named "personal_"+name
+	def create_cached_personal_tweet_list(name, user_id)
+		#Queries the database for the text and timestamps of the 100 latest tweets
 		tweets = Tweet.find_by_sql("SELECT tweets.text, tweets.created_at FROM tweets
-			WHERE tweets.user_id = #{profile_user_id}
+			WHERE tweets.user_id = #{user_id}
 			ORDER BY created_at DESC
 			LIMIT 100")
+
 		tweets.each do |tweet|
 			hash = Hash.new
 			hash[:text] = tweet.text
 			hash[:created_at] = tweet.created_at
-		
-
-			REDIS.lpush(user, hash.to_json)
+			REDIS.lpush(name + "_personal", hash.to_json)
 		end
-		REDIS.expire(user, 120)
+		REDIS.expire(name, 120)
 
 	end
 
-	def redis_relationship_numbers_for_a_user(user, profile_user_id)
-		#@num_followers and @num_following display number of followers/followees of the profile owner
-		num_followers = Relationship.count_followers(profile_user_id)
-		num_following = Relationship.count_followees(profile_user_id)
-		REDIS.set(user+"_num_followers", num_followers)
-		REDIS.set(user+"_num_following", num_following)
-		REDIS.expire(user+"_num_followers", 120)
-		REDIS.expire(user+"_num_following", 120)
+	#Generates a redis object tracking the number of followers for a given user id, with a
+	#unique name determined by the name parameter
+	def create_cached_follower_count(name, user_id)
+		num_followers = Relationship.count_followers(user_id)
+		REDIS.set(name+"_num_followers", num_followers)
+		REDIS.expire(name+"_num_followers", 120)
+	end
+
+	#Generates a redis object tracking the number of followees for a given user id, with a
+	#unique name determined by the name parameter
+	def create_cached_followee_count(name, user_id)
+		num_following = Relationship.count_followees(user_id)
+		REDIS.set(name+"_num_following", num_following)
+		REDIS.expire(name+"_num_following", 120)
 	end
   
 end
@@ -138,25 +152,23 @@ get "/" do
 		#Rather than a ruby list, this is a concatenated string, in order to mimic SQL syntax
 		
 		#Adds the user's id
-		@session_id = User.where(handle: session[:username]).first.id
-		timeline_ids = @session_id.to_s
+		session_id = userid
+		timeline_ids = session_id.to_s
 		
 		#Adds followed users' ids to the list
-		followees_relationships = Relationship.where(follower_id: @session_id)
+		followees_relationships = Relationship.where(follower_id: session_id)
 		followees = followees_relationships.pluck(:followed_id)
 		followees.each do |followee|
 			timeline_ids = "#{timeline_ids} , #{followee.to_s}"
 		end
 		
 		
-		if REDIS.exists(session[:username]) == false
-			redis_list_for_user(session[:username], timeline_ids)
-		end
-		
-				
+		if REDIS.exists(username+ "_timeline") == false
+			create_cached_logged_in_timeline(username, timeline_ids)
+		end	
 		
 		#@num_followed and @num_following display number of followers/followees of the user, respectively
-		@num_followers = Relationship.count_followers(@session_id)
+		@num_followers = Relationship.count_followers(session_id)
 		@num_following = followees_relationships.length
 		
 		erb :main
@@ -173,7 +185,7 @@ post "/login" do
   
 	if user && user.password_hash == BCrypt::Engine.hash_secret(params[:password], user.password_salt)
 		session[:username] = handle
-		session[:id] = user.id
+		session[:userid] = user.id
 		redirect "/"
 	end
   
@@ -191,31 +203,28 @@ post "/user/register" do
 	hash = {:handle => params[:username]}
 	hash[:password] = params[:password]
 	user = User.new(hash)
-	
 	if(user.save)
-    flash[:notice] = "Welcome to the App!"
-    redirect "/"
+    	flash[:notice] = "Welcome to the App!"
+    	redirect "/"
 	else
 		flash[:alert] = "Problem. Please Try again."
 	end
-  
-  session[:username] = params[:username]
-  erb :signup
 end
 
 #Get method for the logout page
 get "/logout" do
   session[:username] = nil
+  session[:userid] = nil
   redirect "/"
 end
 
 #Post method for tweets. Checks if a submitted text is 140 characters or less. If it is, then it is 
 #used to create a tweet.
 post "/tweet" do
-	user = User.where(handle: username).first
+	user = User.find(userid)
 	tweet_text = params[:text]
 	if tweet_text.length <= 140
-		tweet = user.tweets.create(text: tweet_text)
+		tweet = user.tweet(tweet_text)
 	else
 		flash[:alert] = "Please reduce the length of your tweet."
 	end
@@ -240,8 +249,7 @@ get "/user/:userid" do
 		@does_follow = false
 		profile_user_id = params[:userid].to_i
 		if login?
-			@session_id = User.where(handle: session[:username]).first.id
-			followees = Relationship.where(follower_id: @session_id).pluck(:followed_id)
+			followees = Relationship.where(follower_id: userid).pluck(:followed_id)
 			followees.each do |followee|
 				if followee == profile_user_id
 					@does_follow = true
@@ -249,44 +257,44 @@ get "/user/:userid" do
 			end
 		end
 		
-		
-		
 		@username = User.find(profile_user_id).handle
-		#This returns the 100 latest tweets from this user.
-		if REDIS.exists("personal_"+@username) == false
-			redis_personal_list_for_user("personal_"+@username, profile_user_id)
+		#This saves to cache the 100 latest tweets from the profile user.
+		if REDIS.exists(@username+"_personal") == false
+			create_cached_personal_tweet_list(@username, profile_user_id)
 		end
+
+		#This saves to cache the number of followers of the profile user
 		if REDIS.exists(@username+"_num_followers") == false
-			redis_relationship_numbers_for_a_user(@username+"_num_followers", profile_user_id)
+			create_cached_follower_count(@username, profile_user_id)
 		end
 		
+		#This saves to cache the number of followees of the profile user
+		if REDIS.exists(@username+"_num_followees") == false
+			create_cached_followee_count(@username, profile_user_id)
+		end
 		
-		#This gives us the username of the profile user
-		
-		
-		erb :look, :locals => {:userid => params[:userid]}
+		erb :look, :locals => {:profile_user_id => params[:userid]}
 	end
 end 
 
 #This method creates a follow relationship between the session user and the user being followed.
 post "/follow" do
 	followed = User.find(params[:userid])
-	#NOTE FOR LATER: Perhaps we could change the User.follow(n) method so that n is the user's id instead of the user?
-	#This would save us a database lookup.
-  User.where(handle: session[:username]).first.follow(followed)
+	#This method creates the follow relationship in the database
+  	User.find(userid).follow(followed)
    
-  flash[:notice] = "You are following " + followed.handle
-  redirect "/user/#{params[:userid]}"
-  
+  	flash[:notice] = "You are following " + followed.handle
+  	redirect "/user/#{params[:userid]}"
 end
 
 #This method deletes a follow relationship between the session user and a given user.
 post "/unfollow" do
 	followed = User.find(params[:userid])
-	User.where(handle: session[:username]).first.unfollow(followed)
+	#This method deletes the follow relationship in the database
+	User.find(userid).unfollow(followed)
  
-  flash[:notice] = "You are no longer following " + followed.handle
-  redirect "/user/#{params[:userid]}"
+  	flash[:notice] = "You are no longer following " + followed.handle
+  	redirect "/user/#{params[:userid]}"
 end
 
 #Displays a list of a user's followers.
@@ -306,4 +314,6 @@ get "/followees" do
 end
 
 
-
+#Routes necessary for final tests
+get "/test/setup" do
+end

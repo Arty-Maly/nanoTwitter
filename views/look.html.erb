@@ -34,20 +34,21 @@
 
   <div id="profile-box" class="containter left content">
     <h2> @<%= @username %>'s Profile
-      <a href="/followers?userid=<%=userid%>">Followers: <%= REDIS.get(@username+"_num_followers") %> Users</a>
-	    <a href="/followees?userid=<%=userid%>">Following: <%= REDIS.get(@username+"_num_following") %> Users</a>
+      <a href="/followers?userid=<%=profile_user_id%>">Followers: <%= REDIS.get(@username+"_num_followers") %> Users</a>
+	    <a href="/followees?userid=<%=profile_user_id%>">Following: <%= REDIS.get(@username+"_num_following") %> Users</a>
     </h2>
 
-    <% if login? && userid.to_i != @session_id %>
+    <!-- Checks if you are logged in and if your userid matches the profile's user id-->
+    <% if login? && userid != profile_user_id.to_i %>
       <% if @does_follow == false %>
         <form action='/follow' method = "POST">
-            <input id="userid" type="hidden" name="userid" value= "<%= userid%>">
+            <input id="userid" type="hidden" name="userid" value= "<%= profile_user_id%>">
             <input type='submit' value='Follow'>
         </form>
 
       <% elsif @does_follow == true %>
           <form action='/unfollow' method = "POST">
-              <input id="userid" type="hidden" name="userid" value= "<%= userid%>">
+              <input id="userid" type="hidden" name="userid" value= "<%= profile_user_id%>">
               <input type='submit' value='Unfollow'>
           </form>
       <% end %>
@@ -59,14 +60,14 @@
 		<span id="tweet-list">
 			<h4>This User's Tweets</h4>
 			<ul>
-				<% REDIS.lrange("personal_"+@username,0,100).reverse_each do |tweet| %>
+				<% REDIS.lrange(@username+"_personal",0,100).reverse_each do |tweet| %>
           <% parse = JSON.parse(tweet)%>
 					<!-- This line of code triggers the modal, and should trigger to show the user's profile -->
 					<li data-toggle="modal" data-target="#myModal">
 						<img src="http://lorempixum.com/100/100/nature/1">
 						<p>
 							<!-- this should be the @usertag -->
-							<a href="/user/<%=userid%>">@<%=@username %></a>
+							<a href="/user/<%=profile_user_id%>">@<%=@username %></a>
 							<br><a><%= parse["created_at"] %></a>
 						</p>
 						<p> <%= parse["text"]%> </p>

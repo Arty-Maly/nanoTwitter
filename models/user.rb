@@ -42,4 +42,8 @@ def self.authenticate(handle, password)
     active_relationships.find_by(followed_id: other_user.id).destroy
   end
 
+  #Creates a tweet object with this user as its user.
+  def tweet(tweet_text)
+    tweets.create(text: tweet_text)
+  end
 end

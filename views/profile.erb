@@ -1,9 +1,6 @@
 <% flash.each do |msg| %>
 <%= msg[1] %>
 <% end %>
-<!-- get th user id -->
-<% u = User.where(handle: username) %>
-<% id = u[0].id %>
 
 <head>
   <link rel="stylesheet" href="/main.css">
