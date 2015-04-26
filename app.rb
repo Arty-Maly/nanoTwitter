@@ -77,7 +77,7 @@ helpers do
 			hash[:user_id] = tweet.user_id
 			hash[:handle] = tweet.handle
 			hash[:text] = tweet.text
-			hash[:created_at] = tweet.created_at
+			hash[:created_at] = Time.at(tweet.created_at).to_s
 			REDIS.lpush(name + "_timeline", hash.to_json)
 		end
 		REDIS.expire(name + "_timeline", 120)
@@ -94,7 +94,7 @@ helpers do
 		tweets.each do |tweet|
 			hash = Hash.new
 			hash[:text] = tweet.text
-			hash[:created_at] = tweet.created_at
+			hash[:created_at] = Time.at(tweet.created_at).to_s
 			REDIS.lpush(name + "_personal", hash.to_json)
 		end
 		REDIS.expire(name, 120)
@@ -255,7 +255,7 @@ get "/user/:userid" do
 		end
 		
 		#This saves to cache the number of followees of the profile user
-		if REDIS.exists(@username+"_num_followees") == false
+		if REDIS.exists(@username+"_num_following") == false
 			create_cached_followee_count(@username, profile_user_id)
 		end
 		
