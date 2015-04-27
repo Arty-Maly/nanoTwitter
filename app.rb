@@ -15,21 +15,7 @@ enable :sessions
 
 Tilt.register Tilt::ERBTemplate, 'html.erb'
 	
-		#Dont touch this for now. >>>>>>>>>>>>>>>>>>>>>
-		#probs should go into a helper method
-		#on initialize flush redis db and recreate top 100 latest tweets
-		REDIS.flushdb
-		global_tweets = Tweet.search_latest_tweets("")
-		global_tweets.each do |tweet|
-			hash = Hash.new
-			hash[:user_id] = tweet.user_id
-			hash[:handle] = tweet.handle
-			hash[:text] = tweet.text
-			hash[:created_at] = Time.at(tweet.created_at).to_s
-
-			REDIS.lpush("latest100", hash.to_json)
-		end
-	#<<<<<<<<<<<<<<<<<<<<<<<<<<<
+REDIS.flushdb
 
 #helper methods for the rest of the code 
 helpers do
@@ -62,6 +48,21 @@ helpers do
 			erb :profile
 		else
 			erb :login
+		end
+	end
+
+
+	#Constructs a redis object that list the last 100 tweets 
+	def create_cached_global_timeline
+		global_tweets = Tweet.search_latest_tweets("")
+		global_tweets.each do |tweet|
+			hash = Hash.new
+			hash[:user_id] = tweet.user_id
+			hash[:handle] = tweet.handle
+			hash[:text] = tweet.text
+			hash[:created_at] = Time.at(tweet.created_at).to_s
+
+			REDIS.lpush("latest100", hash.to_json)
 		end
 	end
 
@@ -185,8 +186,10 @@ end
 ############################################################################################################################################
 #Get method for the main page
 get "/" do 
-	#Returns a list of tweets from all users in descending order
-	
+	#Prepares a list of tweets from all users in descending order
+	if REDIS.exists("latest100") == false
+		create_cached_global_timeline
+	end
 
 	if login?
 		followees_relationships = Relationship.where(follower_id: userid)
@@ -272,12 +275,7 @@ post "/tweet" do
 		if REDIS.exists(username+"_personal") 
 			update_cache_personal_tweet_list(tweet, username)
 		end
-		puts "======================="
-		puts "======================="
-		puts "======================="
-		puts "======================="
-		puts "======================="
-		puts REDIS.exists("latest100")
+		
 		if REDIS.exists("latest100")
 			update_global_cache_tweets(tweet, username)
 		end
