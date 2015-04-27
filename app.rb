@@ -52,7 +52,7 @@ helpers do
 	end
 
 
-	#Constructs a redis object that list the last 100 tweets 
+	#Constructs a redis object that lists the last 100 tweets 
 	def create_cached_global_timeline
 		global_tweets = Tweet.search_latest_tweets("")
 		global_tweets.each do |tweet|
