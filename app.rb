@@ -138,7 +138,7 @@ helpers do
 		hash[:handle] = name
 		hash[:text] = tweet.text
 		hash[:created_at] = Time.at(tweet.created_at).to_s
-		if REDIS.llen(name + "_timeline") >=  100 
+		if REDIS.llen(name + "_timeline") >= 100 
 			REDIS.lpop(name + "_timeline")
 		end
 		REDIS.rpush(name + "_timeline", hash.to_json)
@@ -149,10 +149,10 @@ helpers do
 		hash = Hash.new
 		hash[:text] = tweet.text
 		hash[:created_at] = Time.at(tweet.created_at).to_s
-		if REDIS.llen(name + "_personal") > 100 
+		if REDIS.llen(name + "_personal") >= 100 
 			REDIS.lpop(name + "_personal")
 		end
-		REDIS.lpush(name + "_personal", hash.to_json)		
+		REDIS.rpush(name + "_personal", hash.to_json)		
 
 	end
 
