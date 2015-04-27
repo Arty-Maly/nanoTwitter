@@ -8,7 +8,7 @@ gem 'bcrypt'
 gem "sinatra-flash"
 gem 'rack-flash3'
 gem 'rack-test'
-gem 'puma'
+gem 'unicorn'
 gem 'faker'
 gem 'rake'
 gem 'redis'

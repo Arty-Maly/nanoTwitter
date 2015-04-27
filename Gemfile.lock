@@ -24,11 +24,10 @@ GEM
       i18n (~> 0.5)
     i18n (0.7.0)
     json (1.8.2)
+    kgio (2.9.3)
     minitest (5.6.0)
     pg (0.18.1)
     pg (0.18.1-x64-mingw32)
-    puma (2.11.2)
-      rack (>= 1.1, < 2.0)
     rack (1.6.0)
     rack-flash3 (1.0.5)
       rack
@@ -36,6 +35,7 @@ GEM
       rack
     rack-test (0.6.3)
       rack (>= 1.0)
+    raindrops (0.13.0)
     rake (10.4.2)
     redis (3.2.1)
     shotgun (0.9.1)
@@ -55,6 +55,10 @@ GEM
     tilt (2.0.1)
     tzinfo (1.2.2)
       thread_safe (~> 0.1)
+    unicorn (4.9.0)
+      kgio (~> 2.6)
+      rack
+      raindrops (~> 0.7)
 
 PLATFORMS
   ruby
@@ -66,7 +70,6 @@ DEPENDENCIES
   bcrypt
   faker
   pg
-  puma
   rack-flash3
   rack-test
   rake
@@ -76,3 +79,4 @@ DEPENDENCIES
   sinatra-activerecord
   sinatra-flash
   sqlite3
+  unicorn
