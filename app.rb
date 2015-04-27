@@ -156,6 +156,13 @@ helpers do
 
 	end
 
+	def create_cached_relations (follower_id, username)
+		followees = Relationship.where(follower_id: userid).pluck(:followed_id)
+		followees.each do |followee|
+			REDIS.sadd(username+"_relations", followee)
+		end
+	end	
+
 
   
 end
@@ -184,6 +191,9 @@ get "/" do
 	if login?
 		followees_relationships = Relationship.where(follower_id: userid)
 
+		if REDIS.exists(username+"_relations") == false
+			create_cached_relations(userid, username)
+		end
 		#Checks if a redis object containing the 100 most recent tweets by the logged-in user and its followers exists
 		#If not, a new one is constructed
 		if REDIS.exists(username+ "_timeline") == false
@@ -285,11 +295,11 @@ get "/user/:userid" do
 		@does_follow = false
 		profile_user_id = params[:userid].to_i
 		if login?
-			followees = Relationship.where(follower_id: userid).pluck(:followed_id)
-			followees.each do |followee|
-				if followee == profile_user_id
-					@does_follow = true
-				end
+			if REDIS.exists(username+"_relations") == false
+				create_cached_relations(userid, username)
+			end
+			if REDIS.sismember(username+"_relations", profile_user_id.to_s)
+				@does_follow = true
 			end
 		end
 		
@@ -318,6 +328,7 @@ post "/follow" do
 	followed = User.find(params[:userid])
 	#This method creates the follow relationship in the database
   	User.find(userid).follow(followed)
+  	REDIS.sadd(username+"_relations", params[:userid])
    
   	flash[:notice] = "You are following " + followed.handle
   	redirect "/user/#{params[:userid]}"
@@ -328,6 +339,7 @@ post "/unfollow" do
 	followed = User.find(params[:userid])
 	#This method deletes the follow relationship in the database
 	User.find(userid).unfollow(followed)
+	REDIS.srem(username+"_relations", params[:userid])
  
   	flash[:notice] = "You are no longer following " + followed.handle
   	redirect "/user/#{params[:userid]}"
