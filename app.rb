@@ -68,7 +68,9 @@ helpers do
 	#Constructs a redis object that lists the last 100 tweets posted by the users with a given set of timeline ids
 	#The name of the redis object is name+"_logged"
 	def create_cached_logged_in_timeline(name, timeline_ids)
+		
 		#Retrieves the last 100 followees' tweets, ordered from most recent to oldest
+		
 		followee_tweets = Tweet.search_latest_tweets_by_users(timeline_ids)
 
 		#Creates a redis object for the list of followee tweets
@@ -123,7 +125,10 @@ helpers do
 		hash[:handle] = handle
 		hash[:text] = tweet.text
 		hash[:created_at] = Time.at(tweet.created_at).to_s
-		REDIS.rpop("latest100")
+		if REDIS.llen("latest100") > 100 
+			REDIS.rpop(name + "lates100")
+		end
+	
 		REDIS.lpush("latest100", hash.to_json)
 	end
 
@@ -133,14 +138,20 @@ helpers do
 		hash[:handle] = name
 		hash[:text] = tweet.text
 		hash[:created_at] = Time.at(tweet.created_at).to_s
-		REDIS.rpop(name + "_timeline")
+		if REDIS.llen(name + "_timeline") > 100 
+			REDIS.rpop(name + "_timeline")
+		end
 		REDIS.lpush(name + "_timeline", hash.to_json)
+		REDIS.expire(name + "_timeline", 120)
 	end
 
 	def update_cache_personal_tweet_list (tweet, name)
 		hash = Hash.new
 		hash[:text] = tweet.text
 		hash[:created_at] = Time.at(tweet.created_at).to_s
+		if REDIS.llen(name + "_personal") > 100 
+			REDIS.rpop(name + "_personal")
+		end
 		REDIS.lpush(name + "_personal", hash.to_json)		
 
 	end
@@ -245,10 +256,7 @@ post "/tweet" do
 		tweet = user.tweet(tweet_text)
 		update_global_cache_tweets(tweet, session[:username])
 		update_timeline_cache_tweets(tweet, session[:username])
-		puts "================="
-		puts "================"
-		puts"=============="
-		puts REDIS.exists(session[:username]+"_personal")
+		
 		if REDIS.exists(session[:username]+"_personal") 
 			update_cache_personal_tweet_list(tweet, session[:username])
 		end
@@ -353,6 +361,7 @@ get "/test_setup" do
 		tester = User.new({:handle => "test_user", :password => "1"})
 		tester.save
 		puts "Tester created!"
+		create_cached_logged_in_timeline("test_user")
 	end
 	erb :test_uris
 end
@@ -360,7 +369,8 @@ end
 #Creates a test tweet posted by test_user
 post "/test_tweet" do
 	text = Faker::Hacker.say_something_smart
-	User.where(handle: "test_user").first.tweet(text)
+	tweet = User.where(handle: "test_user").first.tweet(text)
+	update_timeline_cache_tweets(tweet, "test_user")
 end
 
 
@@ -400,5 +410,8 @@ post "/reset" do
 	Tweet.where(user_id: tester_id).delete_all
 	#Removes all of test_user's follows
 	Relationship.where(follower_id: tester_id).delete_all
+	REDIS.del("test_user_personal")
+	REDIS.del("test_user_timeline")
+
 end
 
