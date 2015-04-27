@@ -313,8 +313,11 @@ get "/user/:userid" do
 				@does_follow = true
 			end
 		end
-		
-		@username = User.find(profile_user_id).handle
+		if REDIS.exists(profile_user_id.to_s+"_userid") == false 
+			user = User.find(profile_user_id).handle
+			REDIS.set(profile_user_id.to_s+"_userid", user)
+		end 
+		@username = REDIS.get(profile_user_id.to_s+"_userid")
 		#This saves to cache the 100 latest tweets from the profile user.
 		if REDIS.exists(@username+"_personal") == false
 			create_cached_personal_tweet_list(@username, profile_user_id)
