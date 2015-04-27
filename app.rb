@@ -370,6 +370,7 @@ end
 post "/test_tweet" do
 	text = Faker::Hacker.say_something_smart
 	tweet = User.where(handle: "test_user").first.tweet(text)
+	update_global_cache_tweets(tweet, "test_user")
 	update_timeline_cache_tweets(tweet, "test_user")
 end
 
