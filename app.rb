@@ -125,11 +125,11 @@ helpers do
 		hash[:handle] = handle
 		hash[:text] = tweet.text
 		hash[:created_at] = Time.at(tweet.created_at).to_s
-		if REDIS.llen("latest100") > 100 
-			REDIS.rpop("lates100")
+		if REDIS.llen("latest100") >= 100 
+			REDIS.lpop("latest100")
 		end
 	
-		REDIS.lpush("latest100", hash.to_json)
+		REDIS.rpush("latest100", hash.to_json)
 	end
 
 	def update_timeline_cache_tweets (tweet, name)
@@ -138,10 +138,10 @@ helpers do
 		hash[:handle] = name
 		hash[:text] = tweet.text
 		hash[:created_at] = Time.at(tweet.created_at).to_s
-		if REDIS.llen(name + "_timeline") > 100 
+		if REDIS.llen(name + "_timeline") >=  100 
 			REDIS.lpop(name + "_timeline")
 		end
-		REDIS.lpush(name + "_timeline", hash.to_json)
+		REDIS.rpush(name + "_timeline", hash.to_json)
 		REDIS.expire(name + "_timeline", 120)
 	end
 
@@ -264,11 +264,22 @@ post "/tweet" do
 	tweet_text = params[:text]
 	if tweet_text.length <= 140
 		tweet = user.tweet(tweet_text)
-		update_global_cache_tweets(tweet, session[:username])
-		update_timeline_cache_tweets(tweet, session[:username])
+
+		if REDIS.exists(username+"_timeline")
+			update_timeline_cache_tweets(tweet, username)
+		end
 		
-		if REDIS.exists(session[:username]+"_personal") 
-			update_cache_personal_tweet_list(tweet, session[:username])
+		if REDIS.exists(username+"_personal") 
+			update_cache_personal_tweet_list(tweet, username)
+		end
+		puts "======================="
+		puts "======================="
+		puts "======================="
+		puts "======================="
+		puts "======================="
+		puts REDIS.exists("latest100")
+		if REDIS.exists("latest100")
+			update_global_cache_tweets(tweet, username)
 		end
 
 	else
