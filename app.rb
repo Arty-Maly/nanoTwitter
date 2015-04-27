@@ -186,7 +186,7 @@ end
 #Get method for the main page
 get "/" do 
 	#Returns a list of tweets from all users in descending order
-	@global_tweets = Tweet.search_latest_tweets("")
+	
 
 	if login?
 		followees_relationships = Relationship.where(follower_id: userid)
