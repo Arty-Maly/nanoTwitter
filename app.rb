@@ -361,7 +361,7 @@ get "/test_setup" do
 		tester = User.new({:handle => "test_user", :password => "1"})
 		tester.save
 		puts "Tester created!"
-		create_cached_logged_in_timeline("test_user")
+		
 	end
 	erb :test_uris
 end
