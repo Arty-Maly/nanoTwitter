@@ -27,7 +27,7 @@ Tilt.register Tilt::ERBTemplate, 'html.erb'
 			hash[:text] = tweet.text
 			hash[:created_at] = Time.at(tweet.created_at).to_s
 
-			REDIS.rpush("latest100", hash.to_json)
+			REDIS.lpush("latest100", hash.to_json)
 		end
 	#<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
