@@ -25,9 +25,9 @@ Tilt.register Tilt::ERBTemplate, 'html.erb'
 			hash[:user_id] = tweet.user_id
 			hash[:handle] = tweet.handle
 			hash[:text] = tweet.text
-			hash[:created_at] = tweet.created_at
+			hash[:created_at] = Time.at(tweet.created_at).to_s
 
-			REDIS.lpush("latest100", hash.to_json)
+			REDIS.rpush("latest100", hash.to_json)
 		end
 	#<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
@@ -78,7 +78,7 @@ helpers do
 			hash[:handle] = tweet.handle
 			hash[:text] = tweet.text
 			hash[:created_at] = Time.at(tweet.created_at).to_s
-			REDIS.lpush(name + "_timeline", hash.to_json)
+			REDIS.rpush(name + "_timeline", hash.to_json)
 		end
 		REDIS.expire(name + "_timeline", 120)
 	end
@@ -95,7 +95,7 @@ helpers do
 			hash = Hash.new
 			hash[:text] = tweet.text
 			hash[:created_at] = Time.at(tweet.created_at).to_s
-			REDIS.lpush(name + "_personal", hash.to_json)
+			REDIS.rpush(name + "_personal", hash.to_json)
 		end
 		REDIS.expire(name + "_personal", 120)
 
@@ -116,6 +116,36 @@ helpers do
 		REDIS.set(name+"_num_following", num_following)
 		REDIS.expire(name+"_num_following", 120)
 	end
+
+	def update_global_cache_tweets(tweet, handle)
+		hash = Hash.new
+		hash[:user_id] = tweet.user_id
+		hash[:handle] = handle
+		hash[:text] = tweet.text
+		hash[:created_at] = Time.at(tweet.created_at).to_s
+		REDIS.rpop("latest100")
+		REDIS.lpush("latest100", hash.to_json)
+	end
+
+	def update_timeline_cache_tweets (tweet, name)
+		hash = Hash.new
+		hash[:user_id] = tweet.user_id
+		hash[:handle] = name
+		hash[:text] = tweet.text
+		hash[:created_at] = Time.at(tweet.created_at).to_s
+		REDIS.rpop(name + "_timeline")
+		REDIS.lpush(name + "_timeline", hash.to_json)
+	end
+
+	def update_cache_personal_tweet_list (tweet, name)
+		hash = Hash.new
+		hash[:text] = tweet.text
+		hash[:created_at] = Time.at(tweet.created_at).to_s
+		REDIS.lpush(name + "_personal", hash.to_json)		
+
+	end
+
+
   
 end
 
@@ -199,8 +229,10 @@ end
 
 #Get method for the logout page
 get "/logout" do
+
   session[:username] = nil
   session[:userid] = nil
+
   redirect "/"
 end
 
@@ -211,6 +243,16 @@ post "/tweet" do
 	tweet_text = params[:text]
 	if tweet_text.length <= 140
 		tweet = user.tweet(tweet_text)
+		update_global_cache_tweets(tweet, session[:username])
+		update_timeline_cache_tweets(tweet, session[:username])
+		puts "================="
+		puts "================"
+		puts"=============="
+		puts REDIS.exists(session[:username]+"_personal")
+		if REDIS.exists(session[:username]+"_personal") 
+			update_cache_personal_tweet_list(tweet, session[:username])
+		end
+
 	else
 		flash[:alert] = "Please reduce the length of your tweet."
 	end

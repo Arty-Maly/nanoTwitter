@@ -57,7 +57,7 @@
     <span id="tweet-list">
       <h4> Recent Tweets By You and The People You Follow </h4>
       <ul>
-        <% REDIS.lrange(session[:username]+"_timeline",0,100).reverse_each do |tweet|  %>
+        <% REDIS.lrange(session[:username]+"_timeline",0,100).each do |tweet|  %>
         <% parse = JSON.parse(tweet)%>
         <!-- This line of code triggers the modal, and should trigger to show the user's profile -->
         <li data-toggle="modal" data-target="#myModal">
