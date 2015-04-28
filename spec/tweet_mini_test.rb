@@ -119,9 +119,11 @@ describe "follow" do
  		describe "POST on /tweet" do
  			it "should create a tweet object" do
  				text = "Goodbye " + Time.now.to_s
- 				post "/tweet", {:text => text}, { "rack.session" => {:userid => @bill_id}}
+ 				post "/tweet", {:text => text}, { "rack.session" => {:userid => @bill_id, :username => "bill"}}
  				Tweet.where(text: text).first.nil?.must_equal false
  			end
  		end
  	end
 end
+
+REDIS.flushdb
