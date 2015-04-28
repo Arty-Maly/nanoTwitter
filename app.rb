@@ -435,8 +435,7 @@ post "/reset" do
 	Tweet.where(user_id: tester_id).delete_all
 	#Removes all of test_user's follows
 	Relationship.where(follower_id: tester_id).delete_all
-	REDIS.del("test_user_personal")
-	REDIS.del("test_user_timeline")
+	REDIS.flushdb
 
 end
 
