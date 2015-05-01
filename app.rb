@@ -452,6 +452,7 @@ get "/test_follow" do
 	#If the test_user is following the user, unfollow
 	if tester.active_relationships.where(followed_id: followee_id).first != nil
 		unfollow(tester,followee)
+		tweet(tester, "Unfollowed someone")
 	#Else follow 
 	else
 		follow(tester,followee)
