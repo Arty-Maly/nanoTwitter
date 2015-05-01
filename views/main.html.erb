@@ -40,8 +40,8 @@
     <div id="user-quick-profile">
       <h2>
         <span> @<%= username %> </span>
-        <span><a href="/followers?userid=<%=session[:userid]%>">You have <%= @num_followers %> Followers</a></span>
-        <span><a href="/followees?userid=<%=session[:userid]%>">You are following <%= @num_following %> users</a></span>
+        <span><a href="/followers?userid=<%=session[:userid]%>"><%= REDIS.get(username+"_num_followers") %> Followers, </a></span>
+        <span><a href="/followees?userid=<%=session[:userid]%>">Following <%= @num_following %> Users</a></span>
       </h2>
     </div>
       <!-- content -->
@@ -63,7 +63,6 @@
         <li data-toggle="modal" data-target="#myModal">
           <img src="http://lorempixum.com/100/100/nature/1">
             <p>
-              <!-- this should be the @usertag -->
               <a href="/user/<%=parse["user_id"]%>">@<%=parse["handle"] %></a>
               <br><a><%= parse["created_at"] %></a>
             </p>
@@ -74,15 +73,15 @@
     </span>
 
     <span id="tweet-list">
+      <!-- The logged-in page displays a smaller global tweet list, in order to provide users to follow-->
       <h4> Global Tweets </h4>
       <ul>
-        <% REDIS.lrange("latest100",0,100).reverse_each do |tweet| %>
+        <% REDIS.lrange("latest100",80,100).reverse_each do |tweet| %>
         <% parse = JSON.parse(tweet)%>
         <!-- This line of code triggers the modal, and should trigger to show the user's profile -->
         <li data-toggle="modal" data-target="#myModal">
           <img src="http://lorempixum.com/100/100/nature/1">
             <p>
-              <!-- this should be the @usertag -->
               <a href="/user/<%=parse["user_id"]%>">@<%=parse["handle"] %></a>
               <br><a><%= (parse["created_at"]) %></a>
             </p>
